@@ -1,0 +1,816 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>suppleAnalysis_20210317</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-04-13"><meta name="DC.source" content="suppleAnalysis_20210317.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Introduction</a></li><li><a href="#2">Load data</a></li><li><a href="#3">prepare 3D mesh and object locations</a></li><li><a href="#4">Exp 1. Movement trajectory for the middle objects (Supplemenatry Fig.1)</a></li><li><a href="#5">Exp 2. Driving+looking movement trajectory (Supplementary Fig 2A)</a></li><li><a href="#6">Exp 2. Drive+looking trajectory analysis (Supplementary Fig 2C)</a></li><li><a href="#7">Exp 3. Flying movement trajectory (Supplementary Figure 4)</a></li><li><a href="#8">Measure the shortest flying distance given the boundary</a></li></ul></div><h2 id="1">Introduction</h2><div><ul><li>This is supplementary analysis script for my series of experiments on spatial memory on the non-flat surface. It visualises/quantify movement trajectory of participants while they were retrieving 8 objects location inside the virtual environment (Unity WebGL)</li></ul></div><div><ul><li>Reference: Kim and Doeller (bioRxiv)_XX. doi:XX</li><li>Dr. Misun Kim (<a href="mailto:mkim@cbs.mpg.de">mkim@cbs.mpg.de</a>)</li></ul></div><pre class="codeinput">clear; close <span class="string">all</span>;clc;
+colorPreset=[0,122,255;162,132,94;142,142,147;40,205,65;88,86,214;255,149,0;255,45,85;175,82,222;1,1,1;90,200,250]/255;<span class="comment">%apple standard system color</span>
+</pre><h2 id="2">Load data</h2><div><ul><li>Raw text output files for each experimental version, tasks, and participants were collated into MATLAB struct variable.</li></ul></div><pre class="codeinput">expName={<span class="string">'drive+Path'</span>,<span class="string">'drive+Euclid'</span>,<span class="string">'drivelook+Path'</span>,<span class="string">'drivelook+Euclid'</span>,<span class="string">'fly+Euclid'</span>};
+<span class="keyword">for</span> i=1:5
+    load(sprintf(<span class="string">'../behavData_preprocessed/data_%s.mat'</span>,expName{i}),<span class="string">'alldata'</span>);
+    tmpAll{i}=alldata;
+<span class="keyword">end</span>
+behAll{1}=[tmpAll{1},tmpAll{2}];<span class="comment">% all participants for drive condition</span>
+behAll{2}=[tmpAll{3},tmpAll{4}];<span class="comment">%all participants for drive/look condition</span>
+behAll{3}=tmpAll{5}; <span class="comment">% all participants for fly condition</span>
+
+clearvars <span class="string">tmpAll</span> <span class="string">alldata</span>;
+</pre><h2 id="3">prepare 3D mesh and object locations</h2><p>Prepare 3D mesh for visualization</p><pre class="codeinput">objLoc2D=[0,0.95;0.9,0.95;0.9,0.05;0.7,0.75;0,0.05;-0.9,0.05;-0.9,0.95;-0.7,0.25];<span class="comment">% normalised 2D coordinate for 8 objects</span>
+<span class="comment">% transform normalised 2D coordinate into 3D</span>
+objLoc3D=[];
+radius=1/pi*2/3;
+<span class="keyword">for</span> i=1:size(objLoc2D,1)
+    <span class="keyword">if</span> (objLoc2D(i,1)&lt;0) <span class="comment">% flat part</span>
+        objLoc3D(i,:)=[objLoc2D(i,1:2),0];
+    <span class="keyword">else</span> <span class="comment">% curve part</span>
+        objLoc3D(i,:)=[sin(objLoc2D(i,1)*pi*3/2)*radius,objLoc2D(i,2),-cos(objLoc2D(i,1)*pi*3/2)*radius+radius];
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% create 3D mesh of the cylinder structure</span>
+[x_2D,y_2D]=meshgrid(-1:0.1:1,0:0.1:1);
+grid2D=[x_2D(:),y_2D(:)];
+
+<span class="keyword">for</span> i=1:size(grid2D,1)
+    <span class="keyword">if</span> (grid2D(i,1)&lt;0)
+        grid3D(i,:)=[grid2D(i,1:2),0];
+    <span class="keyword">else</span>
+        grid3D(i,:)=[sin(grid2D(i,1)*pi*3/2)*radius,grid2D(i,2),-cos(grid2D(i,1)*pi*3/2)*radius+radius];
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+vMat=grid3D;
+fMat=delaunay(x_2D,y_2D);
+
+<span class="comment">% add the walls</span>
+wall_x{1}=[-1,-1,-1,-1];
+wall_y{1}=[0,0,1,1];
+wall_z{1}=[0,0.2,0.2,0];
+
+wall_x{2}=[0,-1,-1,0];
+wall_y{2}=[0,0,0,0];
+wall_z{2}=[0,0,0.2,0.2];
+
+wall_x{3}=[0,-1,-1,0];
+wall_y{3}=[1,1,1,1];
+wall_z{3}=[0,0,0.2,0.2];
+
+wall_x{4}=[-radius,-radius+0.2,-radius+0.2,-radius];
+wall_y{4}=[0,0,1,1];
+wall_z{4}=[radius,radius,radius,radius];
+
+wall_x{5}=[sin(0:pi/6:3*pi/2)*(radius-0.2), sin(3*pi/2:-pi/6:0)*radius];
+wall_y{5}=zeros(1,length(wall_x{5}));
+wall_z{5}=[-cos(0:pi/6:3*pi/2)*(radius-0.2)+radius, -cos(3*pi/2:-pi/6:0)*(radius)+radius];
+
+wall_x{6}=[sin(0:pi/6:3*pi/2)*(radius-0.2), sin(3*pi/2:-pi/6:0)*radius];
+wall_y{6}=ones(1,length(wall_x{6}));
+wall_z{6}=[-cos(0:pi/6:3*pi/2)*(radius-0.2)+radius, -cos(3*pi/2:-pi/6:0)*(radius)+radius];
+
+textlabel={<span class="string">'1'</span>,<span class="string">'2'</span>,<span class="string">'3'</span>,<span class="string">'4'</span>,<span class="string">'5'</span>,<span class="string">'6'</span>,<span class="string">'7'</span>,<span class="string">'8'</span>};
+<span class="comment">% figure('Color','w');</span>
+<span class="comment">% patch('Vertices',vMat,'Faces',fMat,'FaceColor',[0.85,0.85,0.85],'EdgeColor','none','FaceAlpha',0.5);</span>
+<span class="comment">% hold on;</span>
+<span class="comment">% for i=1:6</span>
+<span class="comment">%     patch(wall_x{i},wall_y{i},wall_z{i},[0.85,0.45,0.85],'EdgeColor','none','FaceAlpha',0.5);</span>
+<span class="comment">% end</span>
+</pre><h2 id="4">Exp 1. Movement trajectory for the middle objects (Supplemenatry Fig.1)</h2><div><ul><li>trajectory for selected location for all participant in 3D</li><li>trajectory for selected location for all participan in flatten view</li><li>trajectory when participants started from the flat part</li><li>trajectory when participants started from the curve part</li></ul></div><pre class="codeinput">display=0;
+<span class="keyword">if</span> display==1
+whichobj=5;
+alldata=behAll{1}; <span class="comment">% driving condition</span>
+
+<span class="comment">% prepare base figure</span>
+figure(<span class="string">'Color'</span>,<span class="string">'w'</span>,<span class="string">'Position'</span>,[480,200,774,666]);
+h1=subplot(<span class="string">'Position'</span>,[0.17,0.42,0.65,0.42]);
+patch(<span class="string">'Vertices'</span>,vMat,<span class="string">'Faces'</span>,fMat,<span class="string">'FaceColor'</span>,[0.85,0.85,0.85],<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>,<span class="string">'FaceAlpha'</span>,0.5);hold <span class="string">on</span>
+plot([0 0 0],[0 1 0],<span class="string">'k'</span>); <span class="comment">% midline</span>
+view(3); axis <span class="string">equal</span>;
+
+h2=subplot(<span class="string">'Position'</span>,[0.13,0.11,0.33,0.22]); hold <span class="string">on</span>;
+plot([-1 1 1 -1 -1],[0 0 1 1 0],<span class="string">'k'</span>); <span class="comment">%boundary</span>
+plot([0 0],[0 1],<span class="string">'k'</span>); <span class="comment">%midline</span>
+
+h3=subplot(<span class="string">'Position'</span>,[0.57,0.11,0.33,0.22]); hold <span class="string">on</span>;
+plot([-1 1 1 -1 -1],[0 0 1 1 0],<span class="string">'k'</span>); <span class="comment">%boundary</span>
+plot([0 0],[0 1],<span class="string">'k'</span>); <span class="comment">%midline</span>
+
+startdropCoord=NaN(length(alldata),4);
+<span class="keyword">for</span> sub=1:length(alldata)
+
+    tmptraj=alldata(sub).ObjLocTestTraj; <span class="comment">% trajectory array</span>
+    tmpsum=alldata(sub).ObjLocTestSum; <span class="comment">% summary array containing target object, displacement erro, etc.</span>
+
+    trialidx=ismember([tmpsum.target_x,tmpsum.target_y],objLoc2D(whichobj,:),<span class="string">'rows'</span>); <span class="comment">% get trial ID for 'whichobj' location</span>
+    trialidx=tmpsum.trial(trialidx);
+    trialidx=trialidx(end); <span class="comment">% choose the last trial for that object</span>
+    tmpidx=tmptraj.trial==trialidx &amp; tmptraj.phase==0;<span class="comment">% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they already reach at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)</span>
+    tmpidx=find(tmpidx);
+
+    <span class="keyword">if</span> tmpsum.distError(tmpsum.trial==trialidx)&lt;0.25<span class="comment">% only visualise those who placed the object at roughly right location</span>
+        <span class="comment">% tranform 2D coordinate into 3D</span>
+        tmptraj3D=zeros(length(tmpidx),3);
+        <span class="keyword">for</span> i=1:length(tmpidx)
+            <span class="keyword">if</span> (tmptraj.current_x(tmpidx(i),1)&lt;0)
+                tmptraj3D(i,:)=[tmptraj.current_x(tmpidx(i)),tmptraj.current_y(tmpidx(i)),0];
+            <span class="keyword">else</span>
+                tmptraj3D(i,:)=[sin(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius,tmptraj.current_y(tmpidx(i)),-cos(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius+radius];
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        subplot(h1); plot3(tmptraj3D(:,1),tmptraj3D(:,2),tmptraj3D(:,3));
+        plot3(tmptraj3D(end,1),tmptraj3D(end,2),tmptraj3D(end,3),<span class="string">'Color'</span>,<span class="string">'k'</span>,<span class="string">'Marker'</span>,<span class="string">'+'</span>);
+
+        <span class="comment">% visualise the trajectory separately for those who started from</span>
+        <span class="comment">% the curve and flat part</span>
+        <span class="keyword">if</span> tmptraj.current_x(tmpidx(1))&lt;0  <span class="comment">% when participant starts from the flat side of the environment</span>
+            subplot(h2);
+        <span class="keyword">else</span> <span class="comment">% starting loation: curved side</span>
+            subplot(h3);
+        <span class="keyword">end</span>
+        hplot=plot(tmptraj.current_x(tmpidx),tmptraj.current_y(tmpidx));
+        hold <span class="string">on</span>;
+        <span class="comment">% add the final drop location with + marker</span>
+        plot(tmptraj.current_x(tmpidx(end)),tmptraj.current_y(tmpidx(end)),<span class="string">'Marker'</span>,<span class="string">'+'</span>,<span class="string">'Color'</span>,<span class="string">'k'</span>);
+
+        <span class="comment">% save the start and drop location for each participant</span>
+        startdropCoord(sub,:)=[tmptraj.current_x(tmpidx(1)), tmptraj.current_y(tmpidx(1)), tmptraj.current_x(tmpidx(end)),tmptraj.current_y(tmpidx(end))];
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">% axis equal;</span>
+<span class="comment">% axis off;</span>
+<span class="keyword">end</span>
+</pre><h2 id="5">Exp 2. Driving+looking movement trajectory (Supplementary Fig 2A)</h2><div><ul><li>Visualise the trajectory and vertical viewing of selected participant</li></ul></div><pre class="codeinput">whichobj=5;<span class="comment">%</span>
+alldata=behAll{2}; <span class="comment">% driving/looking condition</span>
+
+<span class="comment">% prepare base figure</span>
+figure(<span class="string">'Color'</span>,<span class="string">'w'</span>);
+patch(<span class="string">'Vertices'</span>,vMat,<span class="string">'Faces'</span>,fMat,<span class="string">'FaceColor'</span>,[0.85,0.85,0.85],<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>,<span class="string">'FaceAlpha'</span>,0.5);hold <span class="string">on</span>
+view(3);axis <span class="string">equal</span>;
+<span class="comment">% for i=1:6</span>
+<span class="comment">%     patch(wall_x{i},wall_y{i},wall_z{i},[0.06,1,1],'EdgeColor','none','FaceAlpha',0.2);</span>
+<span class="comment">% end</span>
+
+startdropCoord=NaN(length(alldata),4);
+sublist=81;<span class="comment">% representatitve subject (this subject's camera tilt distribution is most similar to the group averaged distribution);</span>
+<span class="keyword">for</span> sub=sublist
+
+<span class="comment">%     tmptraj=alldata(sub).ObjLocTestTraj; % trajectory array for object-location test phase</span>
+<span class="comment">%     tmpsum=alldata(sub).ObjLocTestSum; % summary array containing target object, displacement erro, etc.</span>
+<span class="comment">%</span>
+<span class="comment">%     trialidx=ismember([tmpsum.target_x,tmpsum.target_y],objLoc2D(whichobj,:),'rows'); % get trial ID for 'whichobj' location</span>
+<span class="comment">%     trialidx=tmpsum.trial(trialidx);</span>
+<span class="comment">%     trialidx=trialidx(1); % choose the last trial for that object</span>
+<span class="comment">%     tmpidx=tmptraj.trial==trialidx &amp; tmptraj.phase==0;% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they already reach at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)</span>
+<span class="comment">%     tmpidx=find(tmpidx);</span>
+
+    tmptraj=alldata(sub).familiarTraj; <span class="comment">%familiarisation phase</span>
+    tmpidx=find(tmptraj.trial&lt;inf); <span class="comment">% include entire period</span>
+
+        tmptraj3D=zeros(3,length(tmpidx));
+        arrowUp=zeros(3,length(tmpidx));
+        arrowFront=zeros(3,length(tmpidx));
+        arrowCamera=zeros(3,length(tmpidx));
+        <span class="keyword">for</span> i=1:length(tmpidx)<span class="comment">% tranform 2D coordinate into 3D</span>
+            <span class="keyword">if</span> (tmptraj.current_x(tmpidx(i),1)&lt;0)
+                tmptraj3D(:,i)=[tmptraj.current_x(tmpidx(i)),tmptraj.current_y(tmpidx(i)),0];
+                surfacenormal=0; <span class="comment">% 0deg tilt on the flat part of the environment</span>
+            <span class="keyword">else</span>
+                tmptraj3D(:,i)=[sin(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius,tmptraj.current_y(tmpidx(i)),-cos(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius+radius];
+                surfacenormal=-tmptraj.current_x(tmpidx(i))*270; <span class="comment">% [0,1] relative coordinate on 270deg arc is transformed to [0, 270]deg</span>
+            <span class="keyword">end</span>
+            localAzi=-tmptraj.current_heading(tmpidx(i))+90; <span class="comment">% I used different notation of angle and axis when logging the rotation angle around the body up-down axis in Unity that is different from a conventional axis, so I have to transform it here using this formula to convert it to MATLAB conventional axis system</span>
+            localPit=tmptraj.cameraPit(tmpidx(i)); <span class="comment">% Vertical tilt of camera relative to tangential surface</span>
+
+            Ry=rotatematMK([0;1;0],deg2rad(surfacenormal)); <span class="comment">%rotation matrix for rotating over y axis by surfacenormal angle(cylinder part)</span>
+            unitUp=Ry*[0;0;1]; <span class="comment">% upward direction of a participant's body (=surface normal)</span>
+            unitFront=rotatematMK(unitUp,deg2rad(localAzi))*Ry*[1;0;0]; <span class="comment">%rotate the right/leftward at the tangent of surface around the upward body axis</span>
+            unitRight=rotatematMK(unitUp,deg2rad(localAzi+90))*Ry*[1;0;0]; <span class="comment">%rightward vector of character body (pivot axis for camera pitch)</span>
+            unitCamerafront=rotatematMK(unitRight,deg2rad(localPit))*unitFront; <span class="comment">% camera's forward facing direction, which is tilted up/downward</span>
+
+            arrowLen=0.07;
+            arrowUp(:,i)=unitUp*arrowLen;
+            arrowFront(:,i)=unitFront*arrowLen;
+            arrowCamera(:,i)=unitCamerafront*arrowLen;
+        <span class="keyword">end</span>
+
+        selectpoints=1:10:length(tmptraj3D); <span class="comment">%only display every 10th timepoints to reduce clutter</span>
+<span class="comment">%         plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowUp(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowUp(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowUp(3,selectpoints)],'Color','k','LineStyle','-'); % show the upward vector of participant=surface normal</span>
+<span class="comment">%         plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowFront(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowFront(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowFront(3,selectpoints)],'Color','b','LineStyle','-'); % show the forward facing vector=yaw rotation on the surface</span>
+        plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowCamera(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowCamera(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowCamera(3,selectpoints)],<span class="string">'Color'</span>,<span class="string">'m'</span>,<span class="string">'LineStyle'</span>,<span class="string">'-'</span>); <span class="comment">% show the camera foward facing vector=vertical viewing behaviour</span>
+        plot3(tmptraj3D(1,selectpoints),tmptraj3D(2,selectpoints),tmptraj3D(3,selectpoints),<span class="string">'k'</span>);<span class="comment">% trajectory of the center of the mass</span>
+<span class="comment">%         plot3(tmptraj3D(1,end),tmptraj3D(2,end),tmptraj3D(3,end),'Color','k','Marker','o');%display end location</span>
+<span class="comment">%         plot3(tmptraj3D(1,1),tmptraj3D(2,1),tmptraj3D(3,1),'Color','m','Marker','o');%display start location</span>
+        axis <span class="string">off</span>;
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="suppleAnalysis_20210317_01.png" alt=""> <h2 id="6">Exp 2. Drive+looking trajectory analysis (Supplementary Fig 2C)</h2><p>Summarise the vertical viewing angle on the flat and curved part. Hypothesis: participant's look upward on the curve part, and they remain parallel to the surface on the flat part</p><pre class="codeinput">bins=-75:10:75;<span class="comment">% bin for camera tilt angle histogram</span>
+hist_famil=[];hist_famil_flat=[];hist_famil_curve=[];
+hist_objloc=[];hist_objloc_flat=[];hist_objloc_curve=[];
+<span class="keyword">for</span> sub=1:length(alldata)
+    tmptraj=alldata(sub).familiarTraj; <span class="comment">%familiarisation phase</span>
+    cameraPit=tmptraj.cameraPit;
+    cameraPit(cameraPit&gt;180)=cameraPit(cameraPit&gt;180)-360; <span class="comment">%convert [0,360] to [-180,180] because it is more intuitive to check whether it's looking upwards (negative value) or downwards (positive value)</span>
+    hist_famil(sub,:)=histcounts(cameraPit,bins,<span class="string">'Normalization'</span>, <span class="string">'probability'</span>); <span class="comment">% distribution of camera pitch with bins</span>
+    hist_famil_flat(sub,:)=histcounts(cameraPit(tmptraj.current_x&lt;0),bins, <span class="string">'Normalization'</span>, <span class="string">'probability'</span>); <span class="comment">% distribution of camera pitch with bins -75:10:75</span>
+    hist_famil_curve(sub,:)=histcounts(cameraPit(tmptraj.current_x&gt;0),bins, <span class="string">'Normalization'</span>, <span class="string">'probability'</span>); <span class="comment">% distribution of camera pitch with bins -75:10:75</span>
+
+
+    meanPit_famil(sub,1)=mean(cameraPit(tmptraj.current_x&lt;0)); <span class="comment">% mean tilt angle on the flat part</span>
+    meanPit_famil(sub,2)=mean(cameraPit(tmptraj.current_x&gt;0)); <span class="comment">% mean tilt angle on the curved part</span>
+    absPit_famil(sub,1)=mean(abs(cameraPit(tmptraj.current_x&lt;0))); <span class="comment">% magnitude of the tilt on the flat</span>
+    absPit_famil(sub,2)=mean(abs(cameraPit(tmptraj.current_x&gt;0))); <span class="comment">% magnitude of the tile on the curved</span>
+    maxPit_famil(sub,1)=max(cameraPit(tmptraj.current_x&lt;0)); <span class="comment">% max tilt of the tile on the flat</span>
+    maxPit_famil(sub,2)=max(cameraPit(tmptraj.current_x&gt;0)); <span class="comment">% max tilt of the tile on the cruved</span>
+    minPit_famil(sub,1)=min(cameraPit(tmptraj.current_x&lt;0)); <span class="comment">% max tilt of the tile on the flat</span>
+    minPit_famil(sub,2)=min(cameraPit(tmptraj.current_x&gt;0)); <span class="comment">% max tilt of the tile on the cruved</span>
+
+    tmptraj=alldata(sub).ObjLocTestTraj; <span class="comment">%obj location test phase</span>
+    cameraPit=tmptraj.cameraPit;
+    cameraPit(cameraPit&gt;180)=cameraPit(cameraPit&gt;180)-360; <span class="comment">%convert [0,360] to [-180,180] because it is more intuitive to check whether it's looking upwards (negative value) or downwards (positive value)</span>
+    hist_objloc(sub,:)=histcounts(cameraPit,bins, <span class="string">'Normalization'</span>, <span class="string">'probability'</span>);  <span class="comment">% distribution of camera pitch with bins -75:10:75</span>
+    hist_objloc_flat(sub,:)=histcounts(cameraPit(tmptraj.current_x&lt;0),bins, <span class="string">'Normalization'</span>, <span class="string">'probability'</span>); <span class="comment">% distribution of camera pitch with bins -75:10:75</span>
+    hist_objloc_curve(sub,:)=histcounts(cameraPit(tmptraj.current_x&gt;0),bins, <span class="string">'Normalization'</span>, <span class="string">'probability'</span>); <span class="comment">% distribution of camera pitch with bins -75:10:75</span>
+
+    meanPit_objloc(sub,1)=mean(cameraPit(tmptraj.current_x&lt;0)); <span class="comment">% mean tilt angle on the flat</span>
+    meanPit_objloc(sub,2)=mean(cameraPit(tmptraj.current_x&gt;0)); <span class="comment">% mean tilt angle on the curved</span>
+    absPit_objloc(sub,1)=mean(abs(cameraPit(tmptraj.current_x&lt;0))); <span class="comment">% magnitude of the tile on the flat</span>
+    absPit_objloc(sub,2)=mean(abs(cameraPit(tmptraj.current_x&gt;0))); <span class="comment">% magnitude of the tilt on the curved</span>
+    maxPit_objloc(sub,1)=max(cameraPit(tmptraj.current_x&lt;0)); <span class="comment">% max tilt of the tile on the flat</span>
+    maxPit_objloc(sub,2)=max(cameraPit(tmptraj.current_x&gt;0)); <span class="comment">% max tilt of the tile on the cruved</span>
+    minPit_objloc(sub,1)=min(cameraPit(tmptraj.current_x&lt;0)); <span class="comment">% max tilt of the tile on the flat</span>
+    minPit_objloc(sub,2)=min(cameraPit(tmptraj.current_x&gt;0)); <span class="comment">% max tilt of the tile on the cruved</span>
+
+<span class="keyword">end</span>
+<span class="comment">% option=[];option.plotdot=1;option.ticklabel={'flat','curve'};</span>
+<span class="comment">% figure;</span>
+<span class="comment">% subplot(2,2,1);ttestplotMK2(meanPit_famil,option);ylabel('camera pitch(deg)');</span>
+<span class="comment">% subplot(2,2,2);ttestplotMK2(absPit_famil,option);ylabel('magnitude of pitch(deg)');</span>
+<span class="comment">% subplot(2,2,3);ttestplotMK2(meanPit_objloc,option);ylabel('camera pitch(deg)');</span>
+<span class="comment">% subplot(2,2,4);ttestplotMK2(absPit_objloc,option);ylabel('magnitude of pitch(deg)');</span>
+
+figure; <span class="comment">% camerat tilt during familiarisation phase</span>
+bins_mid=0.5*(bins(1:end-1)+bins(2:end));<span class="comment">%middle value of each bin</span>
+subplot(2,1,1);bar(bins_mid,mean(hist_famil_flat,1));ylabel(<span class="string">'probability'</span>);xlabel(<span class="string">'camera tilt (deg)'</span>);title(<span class="string">'flat'</span>);
+hold <span class="string">on</span>;errorbar(bins_mid,mean(hist_famil_flat,1),std(hist_famil_flat,0,1)/sqrt(size(hist_famil_flat,1)-1),<span class="string">'k.'</span>);
+ylim([0 0.5]); box <span class="string">off</span>;
+subplot(2,1,2);bar(bins_mid,mean(hist_famil_curve,1));ylabel(<span class="string">'probability'</span>);xlabel(<span class="string">'camera tilt (deg)'</span>);title(<span class="string">'curve'</span>);
+hold <span class="string">on</span>;errorbar(bins_mid,mean(hist_famil_curve,1),std(hist_famil_curve,0,1)/sqrt(size(hist_famil_curve,1)-1),<span class="string">'k.'</span>);
+ylim([0 0.4]); box <span class="string">off</span>;
+
+<span class="comment">% figure;% camera tilt during obj location test phase</span>
+<span class="comment">% subplot(2,1,1);bar(bins_mid,mean(hist_objloc_flat,1));ylabel('probability');xlabel('camera tilt (deg)');title('flat');</span>
+<span class="comment">% hold on;errorbar(bins_mid,mean(hist_objloc_flat,1),std(hist_objloc_flat,0,1)/sqrt(size(hist_objloc_flat,1)-1),'k.');</span>
+<span class="comment">% box off;</span>
+<span class="comment">% subplot(2,1,2);bar(bins_mid,mean(hist_objloc_curve,1));ylabel('probability');xlabel('camera tilt (deg)');title('curve');</span>
+<span class="comment">% hold on;errorbar(bins_mid,mean(hist_objloc_curve,1),std(hist_objloc_curve,0,1)/sqrt(size(hist_objloc_curve,1)-1),'k.');</span>
+<span class="comment">% box off;</span>
+</pre><img vspace="5" hspace="5" src="suppleAnalysis_20210317_02.png" alt=""> <h2 id="7">Exp 3. Flying movement trajectory (Supplementary Figure 4)</h2><div><ul><li>Visualise the example 3D trajectory of flying movement</li><li>Display the trajectory for the target location on the flat and curve part separately because participants is unlikely to move up,down if both start and end location is on the flat part</li><li>show all participants or just a selected participants?</li></ul></div><pre class="codeinput">alldata=behAll{3}; <span class="comment">% fly condition</span>
+
+<span class="comment">% prepare base figure</span>
+figure(<span class="string">'Color'</span>,<span class="string">'w'</span>);
+<span class="keyword">for</span> k=1:2
+    subplot(1,2,k);
+    patch(<span class="string">'Vertices'</span>,vMat,<span class="string">'Faces'</span>,fMat,<span class="string">'FaceColor'</span>,[0.85,0.85,0.85],<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>,<span class="string">'FaceAlpha'</span>,0.5);hold <span class="string">on</span>
+    <span class="keyword">for</span> i=1:6
+        patch(wall_x{i},wall_y{i},wall_z{i},[0.06,1,1],<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>,<span class="string">'FaceAlpha'</span>,0.2);
+    <span class="keyword">end</span>
+    view(3); axis <span class="string">equal</span>;
+<span class="keyword">end</span>
+
+rng(1);
+sublist=1:length(alldata); <span class="comment">% visualise all participant's trajectory for given object</span>
+sublist=randperm(length(alldata), 10);<span class="comment">% for the visibility display only few random subject's trajectory</span>
+whichobjlist=[3,7];
+<span class="keyword">for</span> sub=sublist
+    <span class="keyword">for</span> k=1:2;
+        tmptraj=alldata(sub).ObjLocTestTraj; <span class="comment">% trajectory array</span>
+        tmpsum=alldata(sub).ObjLocTestSum; <span class="comment">% summary array containing target object, displacement erro, etc.</span>
+
+        whichobj=whichobjlist(k);
+        trialidx=tmpsum.trial(tmpsum.targetLoc==whichobj); <span class="comment">%search for the trial where target is location 2</span>
+        trialidx=trialidx(end); <span class="comment">% choose the last trial for that object</span>
+        tmpidx=tmptraj.trial==trialidx &amp; tmptraj.phase==0;<span class="comment">% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they already reach at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)</span>
+        tmpidx=find(tmpidx);
+        subplot(1,2,k);
+        <span class="keyword">if</span> tmpsum.distError(tmpsum.trial==trialidx)&lt;0.25<span class="comment">% only visualise those who placed the object at roughly right location</span>
+            tmptraj3D=[tmptraj.pos_x(tmpidx),tmptraj.pos_y(tmpidx),tmptraj.pos_z(tmpidx)];
+            plot3(tmptraj3D(:,1),tmptraj3D(:,2),tmptraj3D(:,3)); <span class="comment">%visualise trajectory</span>
+            plot3(tmptraj3D(end,1),tmptraj3D(end,2),tmptraj3D(end,3),<span class="string">'Color'</span>,<span class="string">'k'</span>,<span class="string">'Marker'</span>,<span class="string">'+'</span>); <span class="comment">%mark the end location ofthe trajectory</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">% axis equal;</span>
+<span class="comment">% axis off;</span>
+</pre><img vspace="5" hspace="5" src="suppleAnalysis_20210317_03.png" alt=""> <h2 id="8">Measure the shortest flying distance given the boundary</h2><p>In the main analysis, I measured the 3D Euclid distance as if the space is completely open and one can follow any trajectory, but some path is not physically possible due to transparent boundary. Are participant's Euclid distance estimate better explained by possible travel distance?</p><p>First, set some middle point that participant have to make a detour</p><pre class="codeinput">midpoint{1,2}=[0,0.95,0.2];
+midpoint{1,3}=[0,0.95,0.2];
+midpoint{1,4}=[];
+midpoint{2,3}=[];
+midpoint{2,4}=[];
+midpoint{2,5}=[0,0.95,0.2];
+midpoint{2,6}=[0,0.95,0.2];
+midpoint{2,7}=[0,0.95,0.2];
+midpoint{2,8}=[0,0.95,0.2];
+midpoint{3,4}=[];
+midpoint{3,5}=[0,0,0.2];
+midpoint{3,6}=[0,0,0.2];
+midpoint{3,7}=[0,0,0.2];
+midpoint{3,8}=[0,0,0.2];
+midpoint{4,5}=[];
+midpoint{4,6}=[0,0.75,0.2];
+midpoint{4,7}=[0,0.75,0.2];
+midpoint{4,8}=[0,0.75,0.2];
+
+
+<span class="comment">% prepare base figure</span>
+figure(<span class="string">'Color'</span>,<span class="string">'w'</span>);
+patch(<span class="string">'Vertices'</span>,vMat,<span class="string">'Faces'</span>,fMat,<span class="string">'FaceColor'</span>,[0.85,0.85,0.85],<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>,<span class="string">'FaceAlpha'</span>,0.5);hold <span class="string">on</span>
+<span class="keyword">for</span> i=1:6
+    patch(wall_x{i},wall_y{i},wall_z{i},[0.06,1,1],<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>,<span class="string">'FaceAlpha'</span>,0.2);
+<span class="keyword">end</span>
+text(objLoc3D(:,1),objLoc3D(:,2),objLoc3D(:,3),textlabel);
+view(3); axis <span class="string">equal</span>;
+
+<span class="keyword">for</span> i=1:8
+    <span class="keyword">for</span> j=i+1:8
+        <span class="keyword">if</span> ismember(i,[1,5,6,7,8])&amp;ismember(j,[1,5,6,7,8])
+            distViaMid(i,j)=sqrt(sum((objLoc3D(i,:)-objLoc3D(j,:)).^2,2));
+        <span class="keyword">else</span>
+
+            <span class="keyword">if</span> ~isempty(midpoint{i,j})
+                plot3([objLoc3D(i,1),midpoint{i,j}(1),objLoc3D(j,1)],[objLoc3D(i,2),midpoint{i,j}(2),objLoc3D(j,2)],[objLoc3D(i,3),midpoint{i,j}(3),objLoc3D(j,3)]);
+
+                distViaMid(i,j)=sqrt(sum((objLoc3D(i,:)-midpoint{i,j}).^2,2))+sqrt(sum((objLoc3D(j,:)-midpoint{i,j}).^2,2));
+
+            <span class="keyword">else</span>
+                plot3([objLoc3D(i,1),objLoc3D(j,1)],[objLoc3D(i,2),objLoc3D(j,2)],[objLoc3D(i,3),objLoc3D(j,3)]);
+                distViaMid(i,j)=sqrt(sum((objLoc3D(i,:)-objLoc3D(j,:)).^2,2));
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> i=1:8
+    <span class="keyword">for</span> j=i+1:8
+        distMat2D(i,j)=sqrt(sum((objLoc2D(i,:)-objLoc2D(j,:)).^2,2));
+        distMat3D(i,j)=sqrt(sum((objLoc3D(i,:)-objLoc3D(j,:)).^2,2));
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+tmp=distMat2D(distMat2D&gt;0);
+tmp2=distMat3D(distMat3D&gt;0);
+tmp3=distViaMid(distViaMid&gt;0);
+</pre><img vspace="5" hspace="5" src="suppleAnalysis_20210317_04.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Introduction
+% * This is supplementary analysis script for my series of experiments on spatial memory on
+% the non-flat surface. It visualises/quantify movement trajectory of
+% participants while they were retrieving 8 objects location inside the
+% virtual environment (Unity WebGL)
+%
+% * Reference: Kim and Doeller (bioRxiv)_XX. doi:XX
+% * Dr. Misun Kim (mkim@cbs.mpg.de)
+
+clear; close all;clc;
+colorPreset=[0,122,255;162,132,94;142,142,147;40,205,65;88,86,214;255,149,0;255,45,85;175,82,222;1,1,1;90,200,250]/255;%apple standard system color
+
+%% Load data
+% * Raw text output files for each experimental version, tasks, and participants were collated into MATLAB struct variable.
+expName={'drive+Path','drive+Euclid','drivelook+Path','drivelook+Euclid','fly+Euclid'};
+for i=1:5
+    load(sprintf('../behavData_preprocessed/data_%s.mat',expName{i}),'alldata');
+    tmpAll{i}=alldata;
+end
+behAll{1}=[tmpAll{1},tmpAll{2}];% all participants for drive condition
+behAll{2}=[tmpAll{3},tmpAll{4}];%all participants for drive/look condition
+behAll{3}=tmpAll{5}; % all participants for fly condition
+
+clearvars tmpAll alldata;
+%% prepare 3D mesh and object locations
+% Prepare 3D mesh for visualization
+objLoc2D=[0,0.95;0.9,0.95;0.9,0.05;0.7,0.75;0,0.05;-0.9,0.05;-0.9,0.95;-0.7,0.25];% normalised 2D coordinate for 8 objects
+% transform normalised 2D coordinate into 3D
+objLoc3D=[];
+radius=1/pi*2/3;
+for i=1:size(objLoc2D,1)
+    if (objLoc2D(i,1)<0) % flat part
+        objLoc3D(i,:)=[objLoc2D(i,1:2),0];
+    else % curve part
+        objLoc3D(i,:)=[sin(objLoc2D(i,1)*pi*3/2)*radius,objLoc2D(i,2),-cos(objLoc2D(i,1)*pi*3/2)*radius+radius];
+    end
+end
+
+% create 3D mesh of the cylinder structure
+[x_2D,y_2D]=meshgrid(-1:0.1:1,0:0.1:1);
+grid2D=[x_2D(:),y_2D(:)];
+
+for i=1:size(grid2D,1)
+    if (grid2D(i,1)<0)
+        grid3D(i,:)=[grid2D(i,1:2),0];
+    else
+        grid3D(i,:)=[sin(grid2D(i,1)*pi*3/2)*radius,grid2D(i,2),-cos(grid2D(i,1)*pi*3/2)*radius+radius];
+    end
+end
+vMat=grid3D;
+fMat=delaunay(x_2D,y_2D);
+
+% add the walls
+wall_x{1}=[-1,-1,-1,-1];
+wall_y{1}=[0,0,1,1];
+wall_z{1}=[0,0.2,0.2,0];
+
+wall_x{2}=[0,-1,-1,0];
+wall_y{2}=[0,0,0,0];
+wall_z{2}=[0,0,0.2,0.2];
+
+wall_x{3}=[0,-1,-1,0];
+wall_y{3}=[1,1,1,1];
+wall_z{3}=[0,0,0.2,0.2];
+
+wall_x{4}=[-radius,-radius+0.2,-radius+0.2,-radius];
+wall_y{4}=[0,0,1,1];
+wall_z{4}=[radius,radius,radius,radius];
+
+wall_x{5}=[sin(0:pi/6:3*pi/2)*(radius-0.2), sin(3*pi/2:-pi/6:0)*radius];
+wall_y{5}=zeros(1,length(wall_x{5}));
+wall_z{5}=[-cos(0:pi/6:3*pi/2)*(radius-0.2)+radius, -cos(3*pi/2:-pi/6:0)*(radius)+radius];
+
+wall_x{6}=[sin(0:pi/6:3*pi/2)*(radius-0.2), sin(3*pi/2:-pi/6:0)*radius];
+wall_y{6}=ones(1,length(wall_x{6}));
+wall_z{6}=[-cos(0:pi/6:3*pi/2)*(radius-0.2)+radius, -cos(3*pi/2:-pi/6:0)*(radius)+radius];
+
+textlabel={'1','2','3','4','5','6','7','8'};
+% figure('Color','w');
+% patch('Vertices',vMat,'Faces',fMat,'FaceColor',[0.85,0.85,0.85],'EdgeColor','none','FaceAlpha',0.5);
+% hold on;
+% for i=1:6
+%     patch(wall_x{i},wall_y{i},wall_z{i},[0.85,0.45,0.85],'EdgeColor','none','FaceAlpha',0.5);
+% end
+%% Exp 1. Movement trajectory for the middle objects (Supplemenatry Fig.1)
+% * trajectory for selected location for all participant in 3D
+% * trajectory for selected location for all participan in flatten view
+% * trajectory when participants started from the flat part
+% * trajectory when participants started from the curve part
+display=0;
+if display==1
+whichobj=5;
+alldata=behAll{1}; % driving condition
+
+% prepare base figure
+figure('Color','w','Position',[480,200,774,666]);
+h1=subplot('Position',[0.17,0.42,0.65,0.42]);
+patch('Vertices',vMat,'Faces',fMat,'FaceColor',[0.85,0.85,0.85],'EdgeColor','none','FaceAlpha',0.5);hold on
+plot([0 0 0],[0 1 0],'k'); % midline
+view(3); axis equal;
+
+h2=subplot('Position',[0.13,0.11,0.33,0.22]); hold on;
+plot([-1 1 1 -1 -1],[0 0 1 1 0],'k'); %boundary
+plot([0 0],[0 1],'k'); %midline
+
+h3=subplot('Position',[0.57,0.11,0.33,0.22]); hold on;
+plot([-1 1 1 -1 -1],[0 0 1 1 0],'k'); %boundary
+plot([0 0],[0 1],'k'); %midline
+
+startdropCoord=NaN(length(alldata),4);
+for sub=1:length(alldata)
+    
+    tmptraj=alldata(sub).ObjLocTestTraj; % trajectory array
+    tmpsum=alldata(sub).ObjLocTestSum; % summary array containing target object, displacement erro, etc.
+    
+    trialidx=ismember([tmpsum.target_x,tmpsum.target_y],objLoc2D(whichobj,:),'rows'); % get trial ID for 'whichobj' location
+    trialidx=tmpsum.trial(trialidx);
+    trialidx=trialidx(end); % choose the last trial for that object
+    tmpidx=tmptraj.trial==trialidx & tmptraj.phase==0;% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they already reach at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)
+    tmpidx=find(tmpidx);
+    
+    if tmpsum.distError(tmpsum.trial==trialidx)<0.25% only visualise those who placed the object at roughly right location
+        % tranform 2D coordinate into 3D
+        tmptraj3D=zeros(length(tmpidx),3);
+        for i=1:length(tmpidx)
+            if (tmptraj.current_x(tmpidx(i),1)<0)
+                tmptraj3D(i,:)=[tmptraj.current_x(tmpidx(i)),tmptraj.current_y(tmpidx(i)),0];
+            else
+                tmptraj3D(i,:)=[sin(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius,tmptraj.current_y(tmpidx(i)),-cos(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius+radius];
+            end
+        end
+        subplot(h1); plot3(tmptraj3D(:,1),tmptraj3D(:,2),tmptraj3D(:,3));
+        plot3(tmptraj3D(end,1),tmptraj3D(end,2),tmptraj3D(end,3),'Color','k','Marker','+');
+        
+        % visualise the trajectory separately for those who started from
+        % the curve and flat part
+        if tmptraj.current_x(tmpidx(1))<0  % when participant starts from the flat side of the environment
+            subplot(h2);
+        else % starting loation: curved side
+            subplot(h3);
+        end
+        hplot=plot(tmptraj.current_x(tmpidx),tmptraj.current_y(tmpidx));
+        hold on;
+        % add the final drop location with + marker
+        plot(tmptraj.current_x(tmpidx(end)),tmptraj.current_y(tmpidx(end)),'Marker','+','Color','k');
+        
+        % save the start and drop location for each participant
+        startdropCoord(sub,:)=[tmptraj.current_x(tmpidx(1)), tmptraj.current_y(tmpidx(1)), tmptraj.current_x(tmpidx(end)),tmptraj.current_y(tmpidx(end))];
+    end
+end
+% axis equal;
+% axis off;
+end
+%% Exp 2. Driving+looking movement trajectory (Supplementary Fig 2A)
+% * Visualise the trajectory and vertical viewing of selected participant
+whichobj=5;%
+alldata=behAll{2}; % driving/looking condition
+
+% prepare base figure
+figure('Color','w');
+patch('Vertices',vMat,'Faces',fMat,'FaceColor',[0.85,0.85,0.85],'EdgeColor','none','FaceAlpha',0.5);hold on
+view(3);axis equal;
+% for i=1:6
+%     patch(wall_x{i},wall_y{i},wall_z{i},[0.06,1,1],'EdgeColor','none','FaceAlpha',0.2);
+% end
+
+startdropCoord=NaN(length(alldata),4);
+sublist=81;% representatitve subject (this subject's camera tilt distribution is most similar to the group averaged distribution); 
+for sub=sublist
+    
+%     tmptraj=alldata(sub).ObjLocTestTraj; % trajectory array for object-location test phase
+%     tmpsum=alldata(sub).ObjLocTestSum; % summary array containing target object, displacement erro, etc.
+%     
+%     trialidx=ismember([tmpsum.target_x,tmpsum.target_y],objLoc2D(whichobj,:),'rows'); % get trial ID for 'whichobj' location
+%     trialidx=tmpsum.trial(trialidx);
+%     trialidx=trialidx(1); % choose the last trial for that object
+%     tmpidx=tmptraj.trial==trialidx & tmptraj.phase==0;% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they already reach at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)
+%     tmpidx=find(tmpidx);
+
+    tmptraj=alldata(sub).familiarTraj; %familiarisation phase
+    tmpidx=find(tmptraj.trial<inf); % include entire period
+        
+        tmptraj3D=zeros(3,length(tmpidx));
+        arrowUp=zeros(3,length(tmpidx));
+        arrowFront=zeros(3,length(tmpidx));
+        arrowCamera=zeros(3,length(tmpidx));
+        for i=1:length(tmpidx)% tranform 2D coordinate into 3D
+            if (tmptraj.current_x(tmpidx(i),1)<0)
+                tmptraj3D(:,i)=[tmptraj.current_x(tmpidx(i)),tmptraj.current_y(tmpidx(i)),0];
+                surfacenormal=0; % 0deg tilt on the flat part of the environment
+            else
+                tmptraj3D(:,i)=[sin(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius,tmptraj.current_y(tmpidx(i)),-cos(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius+radius];
+                surfacenormal=-tmptraj.current_x(tmpidx(i))*270; % [0,1] relative coordinate on 270deg arc is transformed to [0, 270]deg
+            end
+            localAzi=-tmptraj.current_heading(tmpidx(i))+90; % I used different notation of angle and axis when logging the rotation angle around the body up-down axis in Unity that is different from a conventional axis, so I have to transform it here using this formula to convert it to MATLAB conventional axis system
+            localPit=tmptraj.cameraPit(tmpidx(i)); % Vertical tilt of camera relative to tangential surface
+            
+            Ry=rotatematMK([0;1;0],deg2rad(surfacenormal)); %rotation matrix for rotating over y axis by surfacenormal angle(cylinder part)
+            unitUp=Ry*[0;0;1]; % upward direction of a participant's body (=surface normal)
+            unitFront=rotatematMK(unitUp,deg2rad(localAzi))*Ry*[1;0;0]; %rotate the right/leftward at the tangent of surface around the upward body axis
+            unitRight=rotatematMK(unitUp,deg2rad(localAzi+90))*Ry*[1;0;0]; %rightward vector of character body (pivot axis for camera pitch)
+            unitCamerafront=rotatematMK(unitRight,deg2rad(localPit))*unitFront; % camera's forward facing direction, which is tilted up/downward
+            
+            arrowLen=0.07;
+            arrowUp(:,i)=unitUp*arrowLen;
+            arrowFront(:,i)=unitFront*arrowLen;
+            arrowCamera(:,i)=unitCamerafront*arrowLen;
+        end
+                        
+        selectpoints=1:10:length(tmptraj3D); %only display every 10th timepoints to reduce clutter
+%         plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowUp(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowUp(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowUp(3,selectpoints)],'Color','k','LineStyle','-'); % show the upward vector of participant=surface normal
+%         plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowFront(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowFront(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowFront(3,selectpoints)],'Color','b','LineStyle','-'); % show the forward facing vector=yaw rotation on the surface
+        plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowCamera(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowCamera(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowCamera(3,selectpoints)],'Color','m','LineStyle','-'); % show the camera foward facing vector=vertical viewing behaviour
+        plot3(tmptraj3D(1,selectpoints),tmptraj3D(2,selectpoints),tmptraj3D(3,selectpoints),'k');% trajectory of the center of the mass
+%         plot3(tmptraj3D(1,end),tmptraj3D(2,end),tmptraj3D(3,end),'Color','k','Marker','o');%display end location
+%         plot3(tmptraj3D(1,1),tmptraj3D(2,1),tmptraj3D(3,1),'Color','m','Marker','o');%display start location
+        axis off;
+end
+%% Exp 2. Drive+looking trajectory analysis (Supplementary Fig 2C)
+% Summarise the vertical viewing angle on the flat and curved part.
+% Hypothesis: participant's look upward on the curve part, and they remain
+% parallel to the surface on the flat part
+
+bins=-75:10:75;% bin for camera tilt angle histogram
+hist_famil=[];hist_famil_flat=[];hist_famil_curve=[];
+hist_objloc=[];hist_objloc_flat=[];hist_objloc_curve=[];
+for sub=1:length(alldata)
+    tmptraj=alldata(sub).familiarTraj; %familiarisation phase
+    cameraPit=tmptraj.cameraPit;
+    cameraPit(cameraPit>180)=cameraPit(cameraPit>180)-360; %convert [0,360] to [-180,180] because it is more intuitive to check whether it's looking upwards (negative value) or downwards (positive value)
+    hist_famil(sub,:)=histcounts(cameraPit,bins,'Normalization', 'probability'); % distribution of camera pitch with bins 
+    hist_famil_flat(sub,:)=histcounts(cameraPit(tmptraj.current_x<0),bins, 'Normalization', 'probability'); % distribution of camera pitch with bins -75:10:75
+    hist_famil_curve(sub,:)=histcounts(cameraPit(tmptraj.current_x>0),bins, 'Normalization', 'probability'); % distribution of camera pitch with bins -75:10:75
+    
+    
+    meanPit_famil(sub,1)=mean(cameraPit(tmptraj.current_x<0)); % mean tilt angle on the flat part
+    meanPit_famil(sub,2)=mean(cameraPit(tmptraj.current_x>0)); % mean tilt angle on the curved part
+    absPit_famil(sub,1)=mean(abs(cameraPit(tmptraj.current_x<0))); % magnitude of the tilt on the flat
+    absPit_famil(sub,2)=mean(abs(cameraPit(tmptraj.current_x>0))); % magnitude of the tile on the curved
+    maxPit_famil(sub,1)=max(cameraPit(tmptraj.current_x<0)); % max tilt of the tile on the flat
+    maxPit_famil(sub,2)=max(cameraPit(tmptraj.current_x>0)); % max tilt of the tile on the cruved
+    minPit_famil(sub,1)=min(cameraPit(tmptraj.current_x<0)); % max tilt of the tile on the flat
+    minPit_famil(sub,2)=min(cameraPit(tmptraj.current_x>0)); % max tilt of the tile on the cruved
+
+    tmptraj=alldata(sub).ObjLocTestTraj; %obj location test phase
+    cameraPit=tmptraj.cameraPit;
+    cameraPit(cameraPit>180)=cameraPit(cameraPit>180)-360; %convert [0,360] to [-180,180] because it is more intuitive to check whether it's looking upwards (negative value) or downwards (positive value)
+    hist_objloc(sub,:)=histcounts(cameraPit,bins, 'Normalization', 'probability');  % distribution of camera pitch with bins -75:10:75
+    hist_objloc_flat(sub,:)=histcounts(cameraPit(tmptraj.current_x<0),bins, 'Normalization', 'probability'); % distribution of camera pitch with bins -75:10:75
+    hist_objloc_curve(sub,:)=histcounts(cameraPit(tmptraj.current_x>0),bins, 'Normalization', 'probability'); % distribution of camera pitch with bins -75:10:75
+    
+    meanPit_objloc(sub,1)=mean(cameraPit(tmptraj.current_x<0)); % mean tilt angle on the flat
+    meanPit_objloc(sub,2)=mean(cameraPit(tmptraj.current_x>0)); % mean tilt angle on the curved
+    absPit_objloc(sub,1)=mean(abs(cameraPit(tmptraj.current_x<0))); % magnitude of the tile on the flat
+    absPit_objloc(sub,2)=mean(abs(cameraPit(tmptraj.current_x>0))); % magnitude of the tilt on the curved
+    maxPit_objloc(sub,1)=max(cameraPit(tmptraj.current_x<0)); % max tilt of the tile on the flat
+    maxPit_objloc(sub,2)=max(cameraPit(tmptraj.current_x>0)); % max tilt of the tile on the cruved
+    minPit_objloc(sub,1)=min(cameraPit(tmptraj.current_x<0)); % max tilt of the tile on the flat
+    minPit_objloc(sub,2)=min(cameraPit(tmptraj.current_x>0)); % max tilt of the tile on the cruved
+
+end
+% option=[];option.plotdot=1;option.ticklabel={'flat','curve'};
+% figure;
+% subplot(2,2,1);ttestplotMK2(meanPit_famil,option);ylabel('camera pitch(deg)');
+% subplot(2,2,2);ttestplotMK2(absPit_famil,option);ylabel('magnitude of pitch(deg)');
+% subplot(2,2,3);ttestplotMK2(meanPit_objloc,option);ylabel('camera pitch(deg)');
+% subplot(2,2,4);ttestplotMK2(absPit_objloc,option);ylabel('magnitude of pitch(deg)');
+
+figure; % camerat tilt during familiarisation phase
+bins_mid=0.5*(bins(1:end-1)+bins(2:end));%middle value of each bin
+subplot(2,1,1);bar(bins_mid,mean(hist_famil_flat,1));ylabel('probability');xlabel('camera tilt (deg)');title('flat');
+hold on;errorbar(bins_mid,mean(hist_famil_flat,1),std(hist_famil_flat,0,1)/sqrt(size(hist_famil_flat,1)-1),'k.');
+ylim([0 0.5]); box off;
+subplot(2,1,2);bar(bins_mid,mean(hist_famil_curve,1));ylabel('probability');xlabel('camera tilt (deg)');title('curve');
+hold on;errorbar(bins_mid,mean(hist_famil_curve,1),std(hist_famil_curve,0,1)/sqrt(size(hist_famil_curve,1)-1),'k.');
+ylim([0 0.4]); box off;
+
+% figure;% camera tilt during obj location test phase
+% subplot(2,1,1);bar(bins_mid,mean(hist_objloc_flat,1));ylabel('probability');xlabel('camera tilt (deg)');title('flat');
+% hold on;errorbar(bins_mid,mean(hist_objloc_flat,1),std(hist_objloc_flat,0,1)/sqrt(size(hist_objloc_flat,1)-1),'k.');
+% box off;
+% subplot(2,1,2);bar(bins_mid,mean(hist_objloc_curve,1));ylabel('probability');xlabel('camera tilt (deg)');title('curve');
+% hold on;errorbar(bins_mid,mean(hist_objloc_curve,1),std(hist_objloc_curve,0,1)/sqrt(size(hist_objloc_curve,1)-1),'k.');
+% box off;
+%% Exp 3. Flying movement trajectory (Supplementary Figure 4)
+% * Visualise the example 3D trajectory of flying movement
+% * Display the trajectory for the target location on the flat and curve
+% part separately because participants is unlikely to move up,down if both
+% start and end location is on the flat part
+% * show all participants or just a selected participants?
+alldata=behAll{3}; % fly condition
+
+% prepare base figure
+figure('Color','w');
+for k=1:2
+    subplot(1,2,k);
+    patch('Vertices',vMat,'Faces',fMat,'FaceColor',[0.85,0.85,0.85],'EdgeColor','none','FaceAlpha',0.5);hold on
+    for i=1:6
+        patch(wall_x{i},wall_y{i},wall_z{i},[0.06,1,1],'EdgeColor','none','FaceAlpha',0.2);
+    end
+    view(3); axis equal;
+end
+
+rng(1);
+sublist=1:length(alldata); % visualise all participant's trajectory for given object
+sublist=randperm(length(alldata), 10);% for the visibility display only few random subject's trajectory
+whichobjlist=[3,7];
+for sub=sublist
+    for k=1:2;
+        tmptraj=alldata(sub).ObjLocTestTraj; % trajectory array
+        tmpsum=alldata(sub).ObjLocTestSum; % summary array containing target object, displacement erro, etc.
+        
+        whichobj=whichobjlist(k);
+        trialidx=tmpsum.trial(tmpsum.targetLoc==whichobj); %search for the trial where target is location 2
+        trialidx=trialidx(end); % choose the last trial for that object
+        tmpidx=tmptraj.trial==trialidx & tmptraj.phase==0;% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they already reach at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)
+        tmpidx=find(tmpidx);
+        subplot(1,2,k);
+        if tmpsum.distError(tmpsum.trial==trialidx)<0.25% only visualise those who placed the object at roughly right location
+            tmptraj3D=[tmptraj.pos_x(tmpidx),tmptraj.pos_y(tmpidx),tmptraj.pos_z(tmpidx)];
+            plot3(tmptraj3D(:,1),tmptraj3D(:,2),tmptraj3D(:,3)); %visualise trajectory
+            plot3(tmptraj3D(end,1),tmptraj3D(end,2),tmptraj3D(end,3),'Color','k','Marker','+'); %mark the end location ofthe trajectory
+        end
+    end
+end
+% axis equal;
+% axis off;
+%% Measure the shortest flying distance given the boundary
+% In the main analysis, I measured the 3D Euclid distance as if the space
+% is completely open and one can follow any trajectory, but some path is
+% not physically possible due to transparent boundary. Are participant's
+% Euclid distance estimate better explained by possible travel distance?
+%
+% First, set some middle point that participant have to make a detour
+midpoint{1,2}=[0,0.95,0.2];
+midpoint{1,3}=[0,0.95,0.2];
+midpoint{1,4}=[];
+midpoint{2,3}=[];
+midpoint{2,4}=[];
+midpoint{2,5}=[0,0.95,0.2];
+midpoint{2,6}=[0,0.95,0.2];
+midpoint{2,7}=[0,0.95,0.2];
+midpoint{2,8}=[0,0.95,0.2];
+midpoint{3,4}=[];
+midpoint{3,5}=[0,0,0.2];
+midpoint{3,6}=[0,0,0.2];
+midpoint{3,7}=[0,0,0.2];
+midpoint{3,8}=[0,0,0.2];
+midpoint{4,5}=[];
+midpoint{4,6}=[0,0.75,0.2];
+midpoint{4,7}=[0,0.75,0.2];
+midpoint{4,8}=[0,0.75,0.2];
+
+
+% prepare base figure
+figure('Color','w');
+patch('Vertices',vMat,'Faces',fMat,'FaceColor',[0.85,0.85,0.85],'EdgeColor','none','FaceAlpha',0.5);hold on
+for i=1:6
+    patch(wall_x{i},wall_y{i},wall_z{i},[0.06,1,1],'EdgeColor','none','FaceAlpha',0.2);
+end
+text(objLoc3D(:,1),objLoc3D(:,2),objLoc3D(:,3),textlabel);
+view(3); axis equal;
+
+for i=1:8
+    for j=i+1:8
+        if ismember(i,[1,5,6,7,8])&ismember(j,[1,5,6,7,8])
+            distViaMid(i,j)=sqrt(sum((objLoc3D(i,:)-objLoc3D(j,:)).^2,2));
+        else
+            
+            if ~isempty(midpoint{i,j})
+                plot3([objLoc3D(i,1),midpoint{i,j}(1),objLoc3D(j,1)],[objLoc3D(i,2),midpoint{i,j}(2),objLoc3D(j,2)],[objLoc3D(i,3),midpoint{i,j}(3),objLoc3D(j,3)]);
+                
+                distViaMid(i,j)=sqrt(sum((objLoc3D(i,:)-midpoint{i,j}).^2,2))+sqrt(sum((objLoc3D(j,:)-midpoint{i,j}).^2,2));
+            
+            else
+                plot3([objLoc3D(i,1),objLoc3D(j,1)],[objLoc3D(i,2),objLoc3D(j,2)],[objLoc3D(i,3),objLoc3D(j,3)]);
+                distViaMid(i,j)=sqrt(sum((objLoc3D(i,:)-objLoc3D(j,:)).^2,2));
+            end
+        end
+    end
+end
+
+for i=1:8
+    for j=i+1:8
+        distMat2D(i,j)=sqrt(sum((objLoc2D(i,:)-objLoc2D(j,:)).^2,2));
+        distMat3D(i,j)=sqrt(sum((objLoc3D(i,:)-objLoc3D(j,:)).^2,2));
+    end
+end
+tmp=distMat2D(distMat2D>0);
+tmp2=distMat3D(distMat3D>0);
+tmp3=distViaMid(distViaMid>0);
+
+##### SOURCE END #####
+--></body></html>
