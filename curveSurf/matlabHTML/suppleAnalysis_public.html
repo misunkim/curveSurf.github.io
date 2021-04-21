@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>suppleAnalysis_20210317</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-04-13"><meta name="DC.source" content="suppleAnalysis_20210317.m"><style type="text/css">
+      --><title>suppleAnalysis_public</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-04-21"><meta name="DC.source" content="suppleAnalysis_public.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,11 +66,10 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Introduction</a></li><li><a href="#2">Load data</a></li><li><a href="#3">prepare 3D mesh and object locations</a></li><li><a href="#4">Exp 1. Movement trajectory for the middle objects (Supplemenatry Fig.1)</a></li><li><a href="#5">Exp 2. Driving+looking movement trajectory (Supplementary Fig 2A)</a></li><li><a href="#6">Exp 2. Drive+looking trajectory analysis (Supplementary Fig 2C)</a></li><li><a href="#7">Exp 3. Flying movement trajectory (Supplementary Figure 4)</a></li><li><a href="#8">Measure the shortest flying distance given the boundary</a></li></ul></div><h2 id="1">Introduction</h2><div><ul><li>This is supplementary analysis script for my series of experiments on spatial memory on the non-flat surface. It visualises/quantify movement trajectory of participants while they were retrieving 8 objects location inside the virtual environment (Unity WebGL)</li></ul></div><div><ul><li>Reference: Kim and Doeller (bioRxiv)_XX. doi:XX</li><li>Dr. Misun Kim (<a href="mailto:mkim@cbs.mpg.de">mkim@cbs.mpg.de</a>)</li></ul></div><pre class="codeinput">clear; close <span class="string">all</span>;clc;
-colorPreset=[0,122,255;162,132,94;142,142,147;40,205,65;88,86,214;255,149,0;255,45,85;175,82,222;1,1,1;90,200,250]/255;<span class="comment">%apple standard system color</span>
-</pre><h2 id="2">Load data</h2><div><ul><li>Raw text output files for each experimental version, tasks, and participants were collated into MATLAB struct variable.</li></ul></div><pre class="codeinput">expName={<span class="string">'drive+Path'</span>,<span class="string">'drive+Euclid'</span>,<span class="string">'drivelook+Path'</span>,<span class="string">'drivelook+Euclid'</span>,<span class="string">'fly+Euclid'</span>};
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Introduction</a></li><li><a href="#2">Load data</a></li><li><a href="#3">Prepare 3D mesh and object locations</a></li><li><a href="#4">Exp 1. Movement trajectory for the middle objects (Supplemenatry Fig.1)</a></li><li><a href="#5">Exp 2. Driving+looking movement trajectory (Supplementary Fig 2A)</a></li><li><a href="#6">Exp 2. Drive+looking trajectory analysis (Supplementary Fig 2C)</a></li><li><a href="#7">Exp 3. Flying movement trajectory (Supplementary Figure 4)</a></li><li><a href="#8">Exp 3. Flying movement trajectory (in case somebody wants to analyse the rotation behaviour of flying participants, not included in the manuscript)</a></li></ul></div><h2 id="1">Introduction</h2><div><ul><li>This is supplementary analysis script for my series of experiments on spatial memory on the non-flat surface. It visualises/quantify movement trajectory of participants while they were retrieving 8 objects location inside the virtual environment (Unity WebGL)</li></ul></div><div><ul><li>Reference: Kim and Doeller (bioRxiv)_XX. doi:XX</li><li>Dr. Misun Kim (<a href="mailto:mkim@cbs.mpg.de">mkim@cbs.mpg.de</a>)</li></ul></div><pre class="codeinput">clear; close <span class="string">all</span>;clc;
+</pre><h2 id="2">Load data</h2><div><ul><li>All data (each task-familiarsiation, object-location test, distance estimation task) for each experimental version (drive/drive+look/fly, Path/Euclid) were collated into MATLAB struct variable.</li><li>Load these all-in-one data file into workspace</li></ul></div><pre class="codeinput">expName={<span class="string">'drive+Path'</span>,<span class="string">'drive+Euclid'</span>,<span class="string">'drivelook+Path'</span>,<span class="string">'drivelook+Euclid'</span>,<span class="string">'fly+Euclid'</span>};
 <span class="keyword">for</span> i=1:5
-    load(sprintf(<span class="string">'../behavData_preprocessed/data_%s.mat'</span>,expName{i}),<span class="string">'alldata'</span>);
+    load(sprintf(<span class="string">'../data/data_%s.mat'</span>,expName{i}),<span class="string">'alldata'</span>);
     tmpAll{i}=alldata;
 <span class="keyword">end</span>
 behAll{1}=[tmpAll{1},tmpAll{2}];<span class="comment">% all participants for drive condition</span>
@@ -78,7 +77,7 @@ behAll{2}=[tmpAll{3},tmpAll{4}];<span class="comment">%all participants for driv
 behAll{3}=tmpAll{5}; <span class="comment">% all participants for fly condition</span>
 
 clearvars <span class="string">tmpAll</span> <span class="string">alldata</span>;
-</pre><h2 id="3">prepare 3D mesh and object locations</h2><p>Prepare 3D mesh for visualization</p><pre class="codeinput">objLoc2D=[0,0.95;0.9,0.95;0.9,0.05;0.7,0.75;0,0.05;-0.9,0.05;-0.9,0.95;-0.7,0.25];<span class="comment">% normalised 2D coordinate for 8 objects</span>
+</pre><h2 id="3">Prepare 3D mesh and object locations</h2><p>Prepare 3D mesh (curved environment) for visualization later</p><pre class="codeinput">objLoc2D=[0,0.95;0.9,0.95;0.9,0.05;0.7,0.75;0,0.05;-0.9,0.05;-0.9,0.95;-0.7,0.25];<span class="comment">% normalised 2D coordinate for 8 objects</span>
 <span class="comment">% transform normalised 2D coordinate into 3D</span>
 objLoc3D=[];
 radius=1/pi*2/3;
@@ -136,9 +135,14 @@ textlabel={<span class="string">'1'</span>,<span class="string">'2'</span>,<span
 <span class="comment">% for i=1:6</span>
 <span class="comment">%     patch(wall_x{i},wall_y{i},wall_z{i},[0.85,0.45,0.85],'EdgeColor','none','FaceAlpha',0.5);</span>
 <span class="comment">% end</span>
-</pre><h2 id="4">Exp 1. Movement trajectory for the middle objects (Supplemenatry Fig.1)</h2><div><ul><li>trajectory for selected location for all participant in 3D</li><li>trajectory for selected location for all participan in flatten view</li><li>trajectory when participants started from the flat part</li><li>trajectory when participants started from the curve part</li></ul></div><pre class="codeinput">display=0;
-<span class="keyword">if</span> display==1
-whichobj=5;
+<span class="comment">% view(3);axis equal; xlabel('X');ylabel('Y');zlabel('Z');</span>
+
+<span class="comment">% figure('Color','w');</span>
+<span class="comment">% plot([-1 1 1 -1 -1],[0 0 1 1 0],'k');hold on;</span>
+<span class="comment">% plot([0 0],[0 1],'k');</span>
+<span class="comment">% xlabel('X');ylabel('Y');axis equal;xlim([-1.1,1.1]);ylim([-0.1,1.1]);</span>
+<span class="comment">% box off;</span>
+</pre><h2 id="4">Exp 1. Movement trajectory for the middle objects (Supplemenatry Fig.1)</h2><div><ul><li>trajectory for selected location for all participant in 3D</li><li>trajectory for selected location for all participan in flatten view</li><li>trajectory when participants started from the flat part</li><li>trajectory when participants started from the curve part</li></ul></div><pre class="codeinput">whichobj=5;
 alldata=behAll{1}; <span class="comment">% driving condition</span>
 
 <span class="comment">% prepare base figure</span>
@@ -165,7 +169,7 @@ startdropCoord=NaN(length(alldata),4);
     trialidx=ismember([tmpsum.target_x,tmpsum.target_y],objLoc2D(whichobj,:),<span class="string">'rows'</span>); <span class="comment">% get trial ID for 'whichobj' location</span>
     trialidx=tmpsum.trial(trialidx);
     trialidx=trialidx(end); <span class="comment">% choose the last trial for that object</span>
-    tmpidx=tmptraj.trial==trialidx &amp; tmptraj.phase==0;<span class="comment">% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they already reach at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)</span>
+    tmpidx=tmptraj.trial==trialidx &amp; tmptraj.phase==0;<span class="comment">% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they have arrived at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)</span>
     tmpidx=find(tmpidx);
 
     <span class="keyword">if</span> tmpsum.distError(tmpsum.trial==trialidx)&lt;0.25<span class="comment">% only visualise those who placed the object at roughly right location</span>
@@ -179,7 +183,7 @@ startdropCoord=NaN(length(alldata),4);
             <span class="keyword">end</span>
         <span class="keyword">end</span>
         subplot(h1); plot3(tmptraj3D(:,1),tmptraj3D(:,2),tmptraj3D(:,3));
-        plot3(tmptraj3D(end,1),tmptraj3D(end,2),tmptraj3D(end,3),<span class="string">'Color'</span>,<span class="string">'k'</span>,<span class="string">'Marker'</span>,<span class="string">'+'</span>);
+        plot3(tmptraj3D(end,1),tmptraj3D(end,2),tmptraj3D(end,3),<span class="string">'Color'</span>,<span class="string">'k'</span>,<span class="string">'Marker'</span>,<span class="string">'+'</span>); <span class="comment">% mark the end location of each participant</span>
 
         <span class="comment">% visualise the trajectory separately for those who started from</span>
         <span class="comment">% the curve and flat part</span>
@@ -199,9 +203,7 @@ startdropCoord=NaN(length(alldata),4);
 <span class="keyword">end</span>
 <span class="comment">% axis equal;</span>
 <span class="comment">% axis off;</span>
-<span class="keyword">end</span>
-</pre><h2 id="5">Exp 2. Driving+looking movement trajectory (Supplementary Fig 2A)</h2><div><ul><li>Visualise the trajectory and vertical viewing of selected participant</li></ul></div><pre class="codeinput">whichobj=5;<span class="comment">%</span>
-alldata=behAll{2}; <span class="comment">% driving/looking condition</span>
+</pre><img vspace="5" hspace="5" src="suppleAnalysis_public_01.png" alt=""> <h2 id="5">Exp 2. Driving+looking movement trajectory (Supplementary Fig 2A)</h2><div><ul><li>Visualise the trajectory and vertical viewing of selected participant during familiarisation phase in driving+looking experiment</li><li>Regarding the camera front facing 3D vector, /axisConvention3D.pdf can be helpful to understand the 3D rotation logic.</li></ul></div><pre class="codeinput">alldata=behAll{2}; <span class="comment">% driving/looking condition</span>
 
 <span class="comment">% prepare base figure</span>
 figure(<span class="string">'Color'</span>,<span class="string">'w'</span>);
@@ -214,56 +216,47 @@ view(3);axis <span class="string">equal</span>;
 startdropCoord=NaN(length(alldata),4);
 sublist=81;<span class="comment">% representatitve subject (this subject's camera tilt distribution is most similar to the group averaged distribution);</span>
 <span class="keyword">for</span> sub=sublist
-
-<span class="comment">%     tmptraj=alldata(sub).ObjLocTestTraj; % trajectory array for object-location test phase</span>
-<span class="comment">%     tmpsum=alldata(sub).ObjLocTestSum; % summary array containing target object, displacement erro, etc.</span>
-<span class="comment">%</span>
-<span class="comment">%     trialidx=ismember([tmpsum.target_x,tmpsum.target_y],objLoc2D(whichobj,:),'rows'); % get trial ID for 'whichobj' location</span>
-<span class="comment">%     trialidx=tmpsum.trial(trialidx);</span>
-<span class="comment">%     trialidx=trialidx(1); % choose the last trial for that object</span>
-<span class="comment">%     tmpidx=tmptraj.trial==trialidx &amp; tmptraj.phase==0;% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they already reach at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)</span>
-<span class="comment">%     tmpidx=find(tmpidx);</span>
-
     tmptraj=alldata(sub).familiarTraj; <span class="comment">%familiarisation phase</span>
     tmpidx=find(tmptraj.trial&lt;inf); <span class="comment">% include entire period</span>
 
-        tmptraj3D=zeros(3,length(tmpidx));
-        arrowUp=zeros(3,length(tmpidx));
-        arrowFront=zeros(3,length(tmpidx));
-        arrowCamera=zeros(3,length(tmpidx));
-        <span class="keyword">for</span> i=1:length(tmpidx)<span class="comment">% tranform 2D coordinate into 3D</span>
-            <span class="keyword">if</span> (tmptraj.current_x(tmpidx(i),1)&lt;0)
-                tmptraj3D(:,i)=[tmptraj.current_x(tmpidx(i)),tmptraj.current_y(tmpidx(i)),0];
-                surfacenormal=0; <span class="comment">% 0deg tilt on the flat part of the environment</span>
-            <span class="keyword">else</span>
-                tmptraj3D(:,i)=[sin(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius,tmptraj.current_y(tmpidx(i)),-cos(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius+radius];
-                surfacenormal=-tmptraj.current_x(tmpidx(i))*270; <span class="comment">% [0,1] relative coordinate on 270deg arc is transformed to [0, 270]deg</span>
-            <span class="keyword">end</span>
-            localAzi=-tmptraj.current_heading(tmpidx(i))+90; <span class="comment">% I used different notation of angle and axis when logging the rotation angle around the body up-down axis in Unity that is different from a conventional axis, so I have to transform it here using this formula to convert it to MATLAB conventional axis system</span>
-            localPit=tmptraj.cameraPit(tmpidx(i)); <span class="comment">% Vertical tilt of camera relative to tangential surface</span>
-
-            Ry=rotatematMK([0;1;0],deg2rad(surfacenormal)); <span class="comment">%rotation matrix for rotating over y axis by surfacenormal angle(cylinder part)</span>
-            unitUp=Ry*[0;0;1]; <span class="comment">% upward direction of a participant's body (=surface normal)</span>
-            unitFront=rotatematMK(unitUp,deg2rad(localAzi))*Ry*[1;0;0]; <span class="comment">%rotate the right/leftward at the tangent of surface around the upward body axis</span>
-            unitRight=rotatematMK(unitUp,deg2rad(localAzi+90))*Ry*[1;0;0]; <span class="comment">%rightward vector of character body (pivot axis for camera pitch)</span>
-            unitCamerafront=rotatematMK(unitRight,deg2rad(localPit))*unitFront; <span class="comment">% camera's forward facing direction, which is tilted up/downward</span>
-
-            arrowLen=0.07;
-            arrowUp(:,i)=unitUp*arrowLen;
-            arrowFront(:,i)=unitFront*arrowLen;
-            arrowCamera(:,i)=unitCamerafront*arrowLen;
+    tmptraj3D=zeros(3,length(tmpidx));
+    arrowUp=zeros(3,length(tmpidx));
+    arrowFront=zeros(3,length(tmpidx));
+    arrowCamera=zeros(3,length(tmpidx));
+    <span class="keyword">for</span> i=1:length(tmpidx)<span class="comment">% tranform 2D coordinate into 3D</span>
+        <span class="keyword">if</span> (tmptraj.current_x(tmpidx(i),1)&lt;0)
+            tmptraj3D(:,i)=[tmptraj.current_x(tmpidx(i)),tmptraj.current_y(tmpidx(i)),0];
+            surfacenormal=0; <span class="comment">% 0deg tilt on the flat part of the environment</span>
+        <span class="keyword">else</span>
+            tmptraj3D(:,i)=[sin(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius,tmptraj.current_y(tmpidx(i)),-cos(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius+radius];
+            surfacenormal=-tmptraj.current_x(tmpidx(i))*270; <span class="comment">% [0,1] relative coordinate on 270deg arc is transformed to [0, 270]deg</span>
         <span class="keyword">end</span>
 
-        selectpoints=1:10:length(tmptraj3D); <span class="comment">%only display every 10th timepoints to reduce clutter</span>
-<span class="comment">%         plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowUp(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowUp(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowUp(3,selectpoints)],'Color','k','LineStyle','-'); % show the upward vector of participant=surface normal</span>
-<span class="comment">%         plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowFront(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowFront(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowFront(3,selectpoints)],'Color','b','LineStyle','-'); % show the forward facing vector=yaw rotation on the surface</span>
-        plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowCamera(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowCamera(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowCamera(3,selectpoints)],<span class="string">'Color'</span>,<span class="string">'m'</span>,<span class="string">'LineStyle'</span>,<span class="string">'-'</span>); <span class="comment">% show the camera foward facing vector=vertical viewing behaviour</span>
-        plot3(tmptraj3D(1,selectpoints),tmptraj3D(2,selectpoints),tmptraj3D(3,selectpoints),<span class="string">'k'</span>);<span class="comment">% trajectory of the center of the mass</span>
-<span class="comment">%         plot3(tmptraj3D(1,end),tmptraj3D(2,end),tmptraj3D(3,end),'Color','k','Marker','o');%display end location</span>
-<span class="comment">%         plot3(tmptraj3D(1,1),tmptraj3D(2,1),tmptraj3D(3,1),'Color','m','Marker','o');%display start location</span>
-        axis <span class="string">off</span>;
+        localAzi=tmptraj.current_heading(tmpidx(i));
+        localPit=tmptraj.cameraPit(tmpidx(i)); <span class="comment">% Vertical tilt of camera relative to tangential surface</span>
+
+        Ry=rotatematMK([0;1;0],deg2rad(surfacenormal)); <span class="comment">%rotation matrix for rotating over y axis by surfacenormal angle(cylinder part)</span>
+        unitUp=Ry*[0;0;1]; <span class="comment">% upward direction of a participant's body (=surface normal)</span>
+        unitFront=rotatematMK(unitUp,deg2rad(-localAzi))*[0;1;0]; <span class="comment">%rotate the right/leftward at the tangent of surface around the upward body axis</span>
+        unitRight=rotatematMK(unitUp,deg2rad(-localAzi-90))*[0;1;0]; <span class="comment">%rightward vector of character body (pivot axis for camera pitch)</span>
+        unitCamerafront=rotatematMK(unitRight,deg2rad(-localPit))*unitFront; <span class="comment">% camera's forward facing direction, which is tilted up/downward</span>
+
+        arrowLen=0.07;
+        arrowUp(:,i)=unitUp*arrowLen;
+        arrowFront(:,i)=unitFront*arrowLen;
+        arrowCamera(:,i)=unitCamerafront*arrowLen;
+    <span class="keyword">end</span>
+
+    selectpoints=1:10:length(tmptraj3D); <span class="comment">%only display every 10th timepoints to reduce clutter</span>
+<span class="comment">%   h1=plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowUp(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowUp(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowUp(3,selectpoints)],'Color','k','LineStyle','-'); % show the upward vector of participant=surface normal</span>
+<span class="comment">%     h2=plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowFront(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowFront(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowFront(3,selectpoints)],'Color','g','LineStyle','-'); % show the forward facing vector=yaw rotation on the surface</span>
+    h3=plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowCamera(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowCamera(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowCamera(3,selectpoints)],<span class="string">'Color'</span>,<span class="string">'m'</span>,<span class="string">'LineStyle'</span>,<span class="string">'-'</span>); <span class="comment">% show the camera foward facing vector=vertical viewing behaviour</span>
+    h4=plot3(tmptraj3D(1,selectpoints),tmptraj3D(2,selectpoints),tmptraj3D(3,selectpoints),<span class="string">'k'</span>);<span class="comment">% trajectory of the center of the mass</span>
+    <span class="comment">%         plot3(tmptraj3D(1,end),tmptraj3D(2,end),tmptraj3D(3,end),'Color','k','Marker','o');%display end location</span>
+    <span class="comment">%         plot3(tmptraj3D(1,1),tmptraj3D(2,1),tmptraj3D(3,1),'Color','m','Marker','o');%display start location</span>
+    axis <span class="string">off</span>;
 <span class="keyword">end</span>
-</pre><img vspace="5" hspace="5" src="suppleAnalysis_20210317_01.png" alt=""> <h2 id="6">Exp 2. Drive+looking trajectory analysis (Supplementary Fig 2C)</h2><p>Summarise the vertical viewing angle on the flat and curved part. Hypothesis: participant's look upward on the curve part, and they remain parallel to the surface on the flat part</p><pre class="codeinput">bins=-75:10:75;<span class="comment">% bin for camera tilt angle histogram</span>
+</pre><img vspace="5" hspace="5" src="suppleAnalysis_public_02.png" alt=""> <h2 id="6">Exp 2. Drive+looking trajectory analysis (Supplementary Fig 2C)</h2><p>Summarise the vertical viewing angle on the flat and curved part. Hypothesis: participant's look upward on the curve part, and they remain parallel to the surface on the flat part</p><pre class="codeinput">bins=-75:10:75;<span class="comment">% bin for camera tilt angle histogram</span>
 hist_famil=[];hist_famil_flat=[];hist_famil_curve=[];
 hist_objloc=[];hist_objloc_flat=[];hist_objloc_curve=[];
 <span class="keyword">for</span> sub=1:length(alldata)
@@ -324,7 +317,7 @@ ylim([0 0.4]); box <span class="string">off</span>;
 <span class="comment">% subplot(2,1,2);bar(bins_mid,mean(hist_objloc_curve,1));ylabel('probability');xlabel('camera tilt (deg)');title('curve');</span>
 <span class="comment">% hold on;errorbar(bins_mid,mean(hist_objloc_curve,1),std(hist_objloc_curve,0,1)/sqrt(size(hist_objloc_curve,1)-1),'k.');</span>
 <span class="comment">% box off;</span>
-</pre><img vspace="5" hspace="5" src="suppleAnalysis_20210317_02.png" alt=""> <h2 id="7">Exp 3. Flying movement trajectory (Supplementary Figure 4)</h2><div><ul><li>Visualise the example 3D trajectory of flying movement</li><li>Display the trajectory for the target location on the flat and curve part separately because participants is unlikely to move up,down if both start and end location is on the flat part</li><li>show all participants or just a selected participants?</li></ul></div><pre class="codeinput">alldata=behAll{3}; <span class="comment">% fly condition</span>
+</pre><img vspace="5" hspace="5" src="suppleAnalysis_public_03.png" alt=""> <h2 id="7">Exp 3. Flying movement trajectory (Supplementary Figure 4)</h2><div><ul><li>Visualise the example 3D trajectory of flying movement</li><li>Display the trajectory for the target location on the flat and curve part separately because participants is unlikely to move up,down if both start and end location is on the flat part</li><li>I can show either selected participants or all participants</li></ul></div><pre class="codeinput">alldata=behAll{3}; <span class="comment">% fly condition</span>
 
 <span class="comment">% prepare base figure</span>
 figure(<span class="string">'Color'</span>,<span class="string">'w'</span>);
@@ -334,12 +327,11 @@ figure(<span class="string">'Color'</span>,<span class="string">'w'</span>);
     <span class="keyword">for</span> i=1:6
         patch(wall_x{i},wall_y{i},wall_z{i},[0.06,1,1],<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>,<span class="string">'FaceAlpha'</span>,0.2);
     <span class="keyword">end</span>
-    view(3); axis <span class="string">equal</span>;
+    view(3); axis <span class="string">equal</span>;axis <span class="string">off</span>;
 <span class="keyword">end</span>
 
 rng(1);
-sublist=1:length(alldata); <span class="comment">% visualise all participant's trajectory for given object</span>
-sublist=randperm(length(alldata), 10);<span class="comment">% for the visibility display only few random subject's trajectory</span>
+sublist=randperm(length(alldata), 10);<span class="comment">% for the visibility, display only a few random subject's trajectory</span>
 whichobjlist=[3,7];
 <span class="keyword">for</span> sub=sublist
     <span class="keyword">for</span> k=1:2;
@@ -347,7 +339,7 @@ whichobjlist=[3,7];
         tmpsum=alldata(sub).ObjLocTestSum; <span class="comment">% summary array containing target object, displacement erro, etc.</span>
 
         whichobj=whichobjlist(k);
-        trialidx=tmpsum.trial(tmpsum.targetLoc==whichobj); <span class="comment">%search for the trial where target is location 2</span>
+        trialidx=tmpsum.trial(tmpsum.targetLoc==whichobj); <span class="comment">%search for the trial in target location is whichobj</span>
         trialidx=trialidx(end); <span class="comment">% choose the last trial for that object</span>
         tmpidx=tmptraj.trial==trialidx &amp; tmptraj.phase==0;<span class="comment">% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they already reach at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)</span>
         tmpidx=find(tmpidx);
@@ -359,66 +351,39 @@ whichobjlist=[3,7];
         <span class="keyword">end</span>
     <span class="keyword">end</span>
 <span class="keyword">end</span>
-<span class="comment">% axis equal;</span>
-<span class="comment">% axis off;</span>
-</pre><img vspace="5" hspace="5" src="suppleAnalysis_20210317_03.png" alt=""> <h2 id="8">Measure the shortest flying distance given the boundary</h2><p>In the main analysis, I measured the 3D Euclid distance as if the space is completely open and one can follow any trajectory, but some path is not physically possible due to transparent boundary. Are participant's Euclid distance estimate better explained by possible travel distance?</p><p>First, set some middle point that participant have to make a detour</p><pre class="codeinput">midpoint{1,2}=[0,0.95,0.2];
-midpoint{1,3}=[0,0.95,0.2];
-midpoint{1,4}=[];
-midpoint{2,3}=[];
-midpoint{2,4}=[];
-midpoint{2,5}=[0,0.95,0.2];
-midpoint{2,6}=[0,0.95,0.2];
-midpoint{2,7}=[0,0.95,0.2];
-midpoint{2,8}=[0,0.95,0.2];
-midpoint{3,4}=[];
-midpoint{3,5}=[0,0,0.2];
-midpoint{3,6}=[0,0,0.2];
-midpoint{3,7}=[0,0,0.2];
-midpoint{3,8}=[0,0,0.2];
-midpoint{4,5}=[];
-midpoint{4,6}=[0,0.75,0.2];
-midpoint{4,7}=[0,0.75,0.2];
-midpoint{4,8}=[0,0.75,0.2];
+<span class="comment">% one can change the view angle to reproduce the Supple Fig4.</span>
+<span class="comment">% view(0,0)//side view</span>
+<span class="comment">% view(0,90)//top down view</span>
+</pre><img vspace="5" hspace="5" src="suppleAnalysis_public_04.png" alt=""> <h2 id="8">Exp 3. Flying movement trajectory (in case somebody wants to analyse the rotation behaviour of flying participants, not included in the manuscript)</h2><div><ul><li>Visualise the 3D trajectory during familisarsation phase of flying movement</li><li>In addition, visualise the camera facing direction of participants</li><li>For axis and rotation convention, check /axisConvention3D.pdf</li></ul></div><pre class="codeinput">sub=1;<span class="comment">% for the visibility display only few random subject's trajectory</span>
+tmptraj=alldata(sub).familiarTraj; <span class="comment">%familiarisation phase</span>
+tmpidx=find(tmptraj.trial&lt;inf); <span class="comment">% include entire period</span>
+tmpidx=find(tmpidx);
 
+tmptraj3D=[tmptraj.pos_x(tmpidx),tmptraj.pos_y(tmpidx),tmptraj.pos_z(tmpidx)]';
+
+arrowCamera=zeros(3,length(tmpidx));
+<span class="keyword">for</span> i=1:length(tmpidx)<span class="comment">% create front facing vector at each time point</span>
+    arrowFront=[0;1;0]; <span class="comment">% camera facing vector was [0;1;0] (MATLAB axis convention)</span>
+    <span class="comment">% In Unity, 3D rotation was applied by Y, X, and Z order (MATLAB axis</span>
+    <span class="comment">% conventinon). 3D rotation is not-commutative, so one should be</span>
+    <span class="comment">% careful when applying the rotation.</span>
+    rot_Y=rotatematMK([0;1;0],deg2rad(tmptraj.euler_y(tmpidx(i))));
+    rot_X=rotatematMK([1;0;0],deg2rad(tmptraj.euler_x(tmpidx(i))));
+    rot_Z=rotatematMK([0;0;1],deg2rad(tmptraj.euler_z(tmpidx(i))));
+
+    arrowLen=0.07; <span class="comment">% length of arrow on the figure</span>
+    arrowCamera(:,i)=arrowLen*rot_Z*rot_X*rot_Y*arrowFront; <span class="comment">%apply the Y rotation first, then X, and Z</span>
+<span class="keyword">end</span>
 
 <span class="comment">% prepare base figure</span>
 figure(<span class="string">'Color'</span>,<span class="string">'w'</span>);
 patch(<span class="string">'Vertices'</span>,vMat,<span class="string">'Faces'</span>,fMat,<span class="string">'FaceColor'</span>,[0.85,0.85,0.85],<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>,<span class="string">'FaceAlpha'</span>,0.5);hold <span class="string">on</span>
-<span class="keyword">for</span> i=1:6
-    patch(wall_x{i},wall_y{i},wall_z{i},[0.06,1,1],<span class="string">'EdgeColor'</span>,<span class="string">'none'</span>,<span class="string">'FaceAlpha'</span>,0.2);
-<span class="keyword">end</span>
-text(objLoc3D(:,1),objLoc3D(:,2),objLoc3D(:,3),textlabel);
 view(3); axis <span class="string">equal</span>;
 
-<span class="keyword">for</span> i=1:8
-    <span class="keyword">for</span> j=i+1:8
-        <span class="keyword">if</span> ismember(i,[1,5,6,7,8])&amp;ismember(j,[1,5,6,7,8])
-            distViaMid(i,j)=sqrt(sum((objLoc3D(i,:)-objLoc3D(j,:)).^2,2));
-        <span class="keyword">else</span>
-
-            <span class="keyword">if</span> ~isempty(midpoint{i,j})
-                plot3([objLoc3D(i,1),midpoint{i,j}(1),objLoc3D(j,1)],[objLoc3D(i,2),midpoint{i,j}(2),objLoc3D(j,2)],[objLoc3D(i,3),midpoint{i,j}(3),objLoc3D(j,3)]);
-
-                distViaMid(i,j)=sqrt(sum((objLoc3D(i,:)-midpoint{i,j}).^2,2))+sqrt(sum((objLoc3D(j,:)-midpoint{i,j}).^2,2));
-
-            <span class="keyword">else</span>
-                plot3([objLoc3D(i,1),objLoc3D(j,1)],[objLoc3D(i,2),objLoc3D(j,2)],[objLoc3D(i,3),objLoc3D(j,3)]);
-                distViaMid(i,j)=sqrt(sum((objLoc3D(i,:)-objLoc3D(j,:)).^2,2));
-            <span class="keyword">end</span>
-        <span class="keyword">end</span>
-    <span class="keyword">end</span>
-<span class="keyword">end</span>
-
-<span class="keyword">for</span> i=1:8
-    <span class="keyword">for</span> j=i+1:8
-        distMat2D(i,j)=sqrt(sum((objLoc2D(i,:)-objLoc2D(j,:)).^2,2));
-        distMat3D(i,j)=sqrt(sum((objLoc3D(i,:)-objLoc3D(j,:)).^2,2));
-    <span class="keyword">end</span>
-<span class="keyword">end</span>
-tmp=distMat2D(distMat2D&gt;0);
-tmp2=distMat3D(distMat3D&gt;0);
-tmp3=distViaMid(distViaMid&gt;0);
-</pre><img vspace="5" hspace="5" src="suppleAnalysis_20210317_04.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+selectpoints=1:3:length(tmpidx); <span class="comment">%only display every 3rd timepoints to reduce clutter</span>
+plot3(tmptraj3D(1,selectpoints),tmptraj3D(2,selectpoints),tmptraj3D(3,selectpoints),<span class="string">'k'</span>);<span class="comment">% trajectory of the center of the mass</span>
+plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowCamera(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowCamera(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowCamera(3,selectpoints)],<span class="string">'Color'</span>,<span class="string">'b'</span>,<span class="string">'LineStyle'</span>,<span class="string">'-'</span>); <span class="comment">% show the forward facing vector</span>
+</pre><img vspace="5" hspace="5" src="suppleAnalysis_public_05.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Introduction
 % * This is supplementary analysis script for my series of experiments on spatial memory on
@@ -430,13 +395,13 @@ tmp3=distViaMid(distViaMid&gt;0);
 % * Dr. Misun Kim (mkim@cbs.mpg.de)
 
 clear; close all;clc;
-colorPreset=[0,122,255;162,132,94;142,142,147;40,205,65;88,86,214;255,149,0;255,45,85;175,82,222;1,1,1;90,200,250]/255;%apple standard system color
 
 %% Load data
-% * Raw text output files for each experimental version, tasks, and participants were collated into MATLAB struct variable.
+% * All data (each task-familiarsiation, object-location test, distance estimation task) for each experimental version (drive/drive+look/fly, Path/Euclid) were collated into MATLAB struct variable.
+% * Load these all-in-one data file into workspace
 expName={'drive+Path','drive+Euclid','drivelook+Path','drivelook+Euclid','fly+Euclid'};
 for i=1:5
-    load(sprintf('../behavData_preprocessed/data_%s.mat',expName{i}),'alldata');
+    load(sprintf('../data/data_%s.mat',expName{i}),'alldata');
     tmpAll{i}=alldata;
 end
 behAll{1}=[tmpAll{1},tmpAll{2}];% all participants for drive condition
@@ -444,8 +409,9 @@ behAll{2}=[tmpAll{3},tmpAll{4}];%all participants for drive/look condition
 behAll{3}=tmpAll{5}; % all participants for fly condition
 
 clearvars tmpAll alldata;
-%% prepare 3D mesh and object locations
-% Prepare 3D mesh for visualization
+%% Prepare 3D mesh and object locations
+% Prepare 3D mesh (curved environment) for visualization later
+
 objLoc2D=[0,0.95;0.9,0.95;0.9,0.05;0.7,0.75;0,0.05;-0.9,0.05;-0.9,0.95;-0.7,0.25];% normalised 2D coordinate for 8 objects
 % transform normalised 2D coordinate into 3D
 objLoc3D=[];
@@ -504,13 +470,18 @@ textlabel={'1','2','3','4','5','6','7','8'};
 % for i=1:6
 %     patch(wall_x{i},wall_y{i},wall_z{i},[0.85,0.45,0.85],'EdgeColor','none','FaceAlpha',0.5);
 % end
+% view(3);axis equal; xlabel('X');ylabel('Y');zlabel('Z');
+
+% figure('Color','w');
+% plot([-1 1 1 -1 -1],[0 0 1 1 0],'k');hold on;
+% plot([0 0],[0 1],'k');
+% xlabel('X');ylabel('Y');axis equal;xlim([-1.1,1.1]);ylim([-0.1,1.1]);
+% box off;
 %% Exp 1. Movement trajectory for the middle objects (Supplemenatry Fig.1)
 % * trajectory for selected location for all participant in 3D
 % * trajectory for selected location for all participan in flatten view
 % * trajectory when participants started from the flat part
 % * trajectory when participants started from the curve part
-display=0;
-if display==1
 whichobj=5;
 alldata=behAll{1}; % driving condition
 
@@ -538,7 +509,7 @@ for sub=1:length(alldata)
     trialidx=ismember([tmpsum.target_x,tmpsum.target_y],objLoc2D(whichobj,:),'rows'); % get trial ID for 'whichobj' location
     trialidx=tmpsum.trial(trialidx);
     trialidx=trialidx(end); % choose the last trial for that object
-    tmpidx=tmptraj.trial==trialidx & tmptraj.phase==0;% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they already reach at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)
+    tmpidx=tmptraj.trial==trialidx & tmptraj.phase==0;% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they have arrived at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)
     tmpidx=find(tmpidx);
     
     if tmpsum.distError(tmpsum.trial==trialidx)<0.25% only visualise those who placed the object at roughly right location
@@ -552,7 +523,7 @@ for sub=1:length(alldata)
             end
         end
         subplot(h1); plot3(tmptraj3D(:,1),tmptraj3D(:,2),tmptraj3D(:,3));
-        plot3(tmptraj3D(end,1),tmptraj3D(end,2),tmptraj3D(end,3),'Color','k','Marker','+');
+        plot3(tmptraj3D(end,1),tmptraj3D(end,2),tmptraj3D(end,3),'Color','k','Marker','+'); % mark the end location of each participant
         
         % visualise the trajectory separately for those who started from
         % the curve and flat part
@@ -572,10 +543,12 @@ for sub=1:length(alldata)
 end
 % axis equal;
 % axis off;
-end
+
 %% Exp 2. Driving+looking movement trajectory (Supplementary Fig 2A)
 % * Visualise the trajectory and vertical viewing of selected participant
-whichobj=5;%
+% during familiarisation phase in driving+looking experiment
+% * Regarding the camera front facing 3D vector, /axisConvention3D.pdf
+% can be helpful to understand the 3D rotation logic.
 alldata=behAll{2}; % driving/looking condition
 
 % prepare base figure
@@ -587,56 +560,47 @@ view(3);axis equal;
 % end
 
 startdropCoord=NaN(length(alldata),4);
-sublist=81;% representatitve subject (this subject's camera tilt distribution is most similar to the group averaged distribution); 
-for sub=sublist
-    
-%     tmptraj=alldata(sub).ObjLocTestTraj; % trajectory array for object-location test phase
-%     tmpsum=alldata(sub).ObjLocTestSum; % summary array containing target object, displacement erro, etc.
-%     
-%     trialidx=ismember([tmpsum.target_x,tmpsum.target_y],objLoc2D(whichobj,:),'rows'); % get trial ID for 'whichobj' location
-%     trialidx=tmpsum.trial(trialidx);
-%     trialidx=trialidx(1); % choose the last trial for that object
-%     tmpidx=tmptraj.trial==trialidx & tmptraj.phase==0;% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they already reach at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)
-%     tmpidx=find(tmpidx);
-
+sublist=81;% representatitve subject (this subject's camera tilt distribution is most similar to the group averaged distribution);
+for sub=sublist        
     tmptraj=alldata(sub).familiarTraj; %familiarisation phase
     tmpidx=find(tmptraj.trial<inf); % include entire period
-        
-        tmptraj3D=zeros(3,length(tmpidx));
-        arrowUp=zeros(3,length(tmpidx));
-        arrowFront=zeros(3,length(tmpidx));
-        arrowCamera=zeros(3,length(tmpidx));
-        for i=1:length(tmpidx)% tranform 2D coordinate into 3D
-            if (tmptraj.current_x(tmpidx(i),1)<0)
-                tmptraj3D(:,i)=[tmptraj.current_x(tmpidx(i)),tmptraj.current_y(tmpidx(i)),0];
-                surfacenormal=0; % 0deg tilt on the flat part of the environment
-            else
-                tmptraj3D(:,i)=[sin(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius,tmptraj.current_y(tmpidx(i)),-cos(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius+radius];
-                surfacenormal=-tmptraj.current_x(tmpidx(i))*270; % [0,1] relative coordinate on 270deg arc is transformed to [0, 270]deg
-            end
-            localAzi=-tmptraj.current_heading(tmpidx(i))+90; % I used different notation of angle and axis when logging the rotation angle around the body up-down axis in Unity that is different from a conventional axis, so I have to transform it here using this formula to convert it to MATLAB conventional axis system
-            localPit=tmptraj.cameraPit(tmpidx(i)); % Vertical tilt of camera relative to tangential surface
-            
-            Ry=rotatematMK([0;1;0],deg2rad(surfacenormal)); %rotation matrix for rotating over y axis by surfacenormal angle(cylinder part)
-            unitUp=Ry*[0;0;1]; % upward direction of a participant's body (=surface normal)
-            unitFront=rotatematMK(unitUp,deg2rad(localAzi))*Ry*[1;0;0]; %rotate the right/leftward at the tangent of surface around the upward body axis
-            unitRight=rotatematMK(unitUp,deg2rad(localAzi+90))*Ry*[1;0;0]; %rightward vector of character body (pivot axis for camera pitch)
-            unitCamerafront=rotatematMK(unitRight,deg2rad(localPit))*unitFront; % camera's forward facing direction, which is tilted up/downward
-            
-            arrowLen=0.07;
-            arrowUp(:,i)=unitUp*arrowLen;
-            arrowFront(:,i)=unitFront*arrowLen;
-            arrowCamera(:,i)=unitCamerafront*arrowLen;
+    
+    tmptraj3D=zeros(3,length(tmpidx));
+    arrowUp=zeros(3,length(tmpidx));
+    arrowFront=zeros(3,length(tmpidx));
+    arrowCamera=zeros(3,length(tmpidx));
+    for i=1:length(tmpidx)% tranform 2D coordinate into 3D
+        if (tmptraj.current_x(tmpidx(i),1)<0)
+            tmptraj3D(:,i)=[tmptraj.current_x(tmpidx(i)),tmptraj.current_y(tmpidx(i)),0];
+            surfacenormal=0; % 0deg tilt on the flat part of the environment
+        else
+            tmptraj3D(:,i)=[sin(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius,tmptraj.current_y(tmpidx(i)),-cos(tmptraj.current_x(tmpidx(i))*pi*3/2)*radius+radius];
+            surfacenormal=-tmptraj.current_x(tmpidx(i))*270; % [0,1] relative coordinate on 270deg arc is transformed to [0, 270]deg
         end
-                        
-        selectpoints=1:10:length(tmptraj3D); %only display every 10th timepoints to reduce clutter
-%         plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowUp(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowUp(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowUp(3,selectpoints)],'Color','k','LineStyle','-'); % show the upward vector of participant=surface normal
-%         plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowFront(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowFront(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowFront(3,selectpoints)],'Color','b','LineStyle','-'); % show the forward facing vector=yaw rotation on the surface
-        plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowCamera(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowCamera(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowCamera(3,selectpoints)],'Color','m','LineStyle','-'); % show the camera foward facing vector=vertical viewing behaviour
-        plot3(tmptraj3D(1,selectpoints),tmptraj3D(2,selectpoints),tmptraj3D(3,selectpoints),'k');% trajectory of the center of the mass
-%         plot3(tmptraj3D(1,end),tmptraj3D(2,end),tmptraj3D(3,end),'Color','k','Marker','o');%display end location
-%         plot3(tmptraj3D(1,1),tmptraj3D(2,1),tmptraj3D(3,1),'Color','m','Marker','o');%display start location
-        axis off;
+        
+        localAzi=tmptraj.current_heading(tmpidx(i));
+        localPit=tmptraj.cameraPit(tmpidx(i)); % Vertical tilt of camera relative to tangential surface
+        
+        Ry=rotatematMK([0;1;0],deg2rad(surfacenormal)); %rotation matrix for rotating over y axis by surfacenormal angle(cylinder part)
+        unitUp=Ry*[0;0;1]; % upward direction of a participant's body (=surface normal)
+        unitFront=rotatematMK(unitUp,deg2rad(-localAzi))*[0;1;0]; %rotate the right/leftward at the tangent of surface around the upward body axis
+        unitRight=rotatematMK(unitUp,deg2rad(-localAzi-90))*[0;1;0]; %rightward vector of character body (pivot axis for camera pitch)
+        unitCamerafront=rotatematMK(unitRight,deg2rad(-localPit))*unitFront; % camera's forward facing direction, which is tilted up/downward
+        
+        arrowLen=0.07;
+        arrowUp(:,i)=unitUp*arrowLen;
+        arrowFront(:,i)=unitFront*arrowLen;
+        arrowCamera(:,i)=unitCamerafront*arrowLen;
+    end
+    
+    selectpoints=1:10:length(tmptraj3D); %only display every 10th timepoints to reduce clutter
+%   h1=plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowUp(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowUp(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowUp(3,selectpoints)],'Color','k','LineStyle','-'); % show the upward vector of participant=surface normal
+%     h2=plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowFront(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowFront(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowFront(3,selectpoints)],'Color','g','LineStyle','-'); % show the forward facing vector=yaw rotation on the surface
+    h3=plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowCamera(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowCamera(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowCamera(3,selectpoints)],'Color','m','LineStyle','-'); % show the camera foward facing vector=vertical viewing behaviour
+    h4=plot3(tmptraj3D(1,selectpoints),tmptraj3D(2,selectpoints),tmptraj3D(3,selectpoints),'k');% trajectory of the center of the mass
+    %         plot3(tmptraj3D(1,end),tmptraj3D(2,end),tmptraj3D(3,end),'Color','k','Marker','o');%display end location
+    %         plot3(tmptraj3D(1,1),tmptraj3D(2,1),tmptraj3D(3,1),'Color','m','Marker','o');%display start location
+    axis off;
 end
 %% Exp 2. Drive+looking trajectory analysis (Supplementary Fig 2C)
 % Summarise the vertical viewing angle on the flat and curved part.
@@ -650,7 +614,7 @@ for sub=1:length(alldata)
     tmptraj=alldata(sub).familiarTraj; %familiarisation phase
     cameraPit=tmptraj.cameraPit;
     cameraPit(cameraPit>180)=cameraPit(cameraPit>180)-360; %convert [0,360] to [-180,180] because it is more intuitive to check whether it's looking upwards (negative value) or downwards (positive value)
-    hist_famil(sub,:)=histcounts(cameraPit,bins,'Normalization', 'probability'); % distribution of camera pitch with bins 
+    hist_famil(sub,:)=histcounts(cameraPit,bins,'Normalization', 'probability'); % distribution of camera pitch with bins
     hist_famil_flat(sub,:)=histcounts(cameraPit(tmptraj.current_x<0),bins, 'Normalization', 'probability'); % distribution of camera pitch with bins -75:10:75
     hist_famil_curve(sub,:)=histcounts(cameraPit(tmptraj.current_x>0),bins, 'Normalization', 'probability'); % distribution of camera pitch with bins -75:10:75
     
@@ -663,7 +627,7 @@ for sub=1:length(alldata)
     maxPit_famil(sub,2)=max(cameraPit(tmptraj.current_x>0)); % max tilt of the tile on the cruved
     minPit_famil(sub,1)=min(cameraPit(tmptraj.current_x<0)); % max tilt of the tile on the flat
     minPit_famil(sub,2)=min(cameraPit(tmptraj.current_x>0)); % max tilt of the tile on the cruved
-
+    
     tmptraj=alldata(sub).ObjLocTestTraj; %obj location test phase
     cameraPit=tmptraj.cameraPit;
     cameraPit(cameraPit>180)=cameraPit(cameraPit>180)-360; %convert [0,360] to [-180,180] because it is more intuitive to check whether it's looking upwards (negative value) or downwards (positive value)
@@ -679,7 +643,7 @@ for sub=1:length(alldata)
     maxPit_objloc(sub,2)=max(cameraPit(tmptraj.current_x>0)); % max tilt of the tile on the cruved
     minPit_objloc(sub,1)=min(cameraPit(tmptraj.current_x<0)); % max tilt of the tile on the flat
     minPit_objloc(sub,2)=min(cameraPit(tmptraj.current_x>0)); % max tilt of the tile on the cruved
-
+    
 end
 % option=[];option.plotdot=1;option.ticklabel={'flat','curve'};
 % figure;
@@ -709,7 +673,7 @@ ylim([0 0.4]); box off;
 % * Display the trajectory for the target location on the flat and curve
 % part separately because participants is unlikely to move up,down if both
 % start and end location is on the flat part
-% * show all participants or just a selected participants?
+% * I can show either selected participants or all participants
 alldata=behAll{3}; % fly condition
 
 % prepare base figure
@@ -720,12 +684,11 @@ for k=1:2
     for i=1:6
         patch(wall_x{i},wall_y{i},wall_z{i},[0.06,1,1],'EdgeColor','none','FaceAlpha',0.2);
     end
-    view(3); axis equal;
+    view(3); axis equal;axis off;
 end
 
 rng(1);
-sublist=1:length(alldata); % visualise all participant's trajectory for given object
-sublist=randperm(length(alldata), 10);% for the visibility display only few random subject's trajectory
+sublist=randperm(length(alldata), 10);% for the visibility, display only a few random subject's trajectory
 whichobjlist=[3,7];
 for sub=sublist
     for k=1:2;
@@ -733,7 +696,7 @@ for sub=sublist
         tmpsum=alldata(sub).ObjLocTestSum; % summary array containing target object, displacement erro, etc.
         
         whichobj=whichobjlist(k);
-        trialidx=tmpsum.trial(tmpsum.targetLoc==whichobj); %search for the trial where target is location 2
+        trialidx=tmpsum.trial(tmpsum.targetLoc==whichobj); %search for the trial in target location is whichobj
         trialidx=trialidx(end); % choose the last trial for that object
         tmpidx=tmptraj.trial==trialidx & tmptraj.phase==0;% idx for particular trial(trialidx), and the time period when participants were moving towards the remembered location (phase=0). cf. Phase=1 is the feedback phase when participants move towards the correct location of the object, phase=2 when they already reach at the vicinity of the correct location and before they move onto the next trial; (phase 2 can be very short or absent)
         tmpidx=find(tmpidx);
@@ -745,72 +708,43 @@ for sub=sublist
         end
     end
 end
-% axis equal;
-% axis off;
-%% Measure the shortest flying distance given the boundary
-% In the main analysis, I measured the 3D Euclid distance as if the space
-% is completely open and one can follow any trajectory, but some path is
-% not physically possible due to transparent boundary. Are participant's
-% Euclid distance estimate better explained by possible travel distance?
-%
-% First, set some middle point that participant have to make a detour
-midpoint{1,2}=[0,0.95,0.2];
-midpoint{1,3}=[0,0.95,0.2];
-midpoint{1,4}=[];
-midpoint{2,3}=[];
-midpoint{2,4}=[];
-midpoint{2,5}=[0,0.95,0.2];
-midpoint{2,6}=[0,0.95,0.2];
-midpoint{2,7}=[0,0.95,0.2];
-midpoint{2,8}=[0,0.95,0.2];
-midpoint{3,4}=[];
-midpoint{3,5}=[0,0,0.2];
-midpoint{3,6}=[0,0,0.2];
-midpoint{3,7}=[0,0,0.2];
-midpoint{3,8}=[0,0,0.2];
-midpoint{4,5}=[];
-midpoint{4,6}=[0,0.75,0.2];
-midpoint{4,7}=[0,0.75,0.2];
-midpoint{4,8}=[0,0.75,0.2];
+% one can change the view angle to reproduce the Supple Fig4. 
+% view(0,0)//side view
+% view(0,90)//top down view
 
+%% Exp 3. Flying movement trajectory (in case somebody wants to analyse the rotation behaviour of flying participants, not included in the manuscript)
+% * Visualise the 3D trajectory during familisarsation phase of flying movement
+% * In addition, visualise the camera facing direction of participants
+% * For axis and rotation convention, check /axisConvention3D.pdf
+
+sub=1;% for the visibility display only few random subject's trajectory
+tmptraj=alldata(sub).familiarTraj; %familiarisation phase
+tmpidx=find(tmptraj.trial<inf); % include entire period
+tmpidx=find(tmpidx);
+
+tmptraj3D=[tmptraj.pos_x(tmpidx),tmptraj.pos_y(tmpidx),tmptraj.pos_z(tmpidx)]';
+
+arrowCamera=zeros(3,length(tmpidx));
+for i=1:length(tmpidx)% create front facing vector at each time point
+    arrowFront=[0;1;0]; % camera facing vector was [0;1;0] (MATLAB axis convention)
+    % In Unity, 3D rotation was applied by Y, X, and Z order (MATLAB axis
+    % conventinon). 3D rotation is not-commutative, so one should be
+    % careful when applying the rotation.
+    rot_Y=rotatematMK([0;1;0],deg2rad(tmptraj.euler_y(tmpidx(i))));
+    rot_X=rotatematMK([1;0;0],deg2rad(tmptraj.euler_x(tmpidx(i))));
+    rot_Z=rotatematMK([0;0;1],deg2rad(tmptraj.euler_z(tmpidx(i))));
+    
+    arrowLen=0.07; % length of arrow on the figure
+    arrowCamera(:,i)=arrowLen*rot_Z*rot_X*rot_Y*arrowFront; %apply the Y rotation first, then X, and Z
+end
 
 % prepare base figure
 figure('Color','w');
 patch('Vertices',vMat,'Faces',fMat,'FaceColor',[0.85,0.85,0.85],'EdgeColor','none','FaceAlpha',0.5);hold on
-for i=1:6
-    patch(wall_x{i},wall_y{i},wall_z{i},[0.06,1,1],'EdgeColor','none','FaceAlpha',0.2);
-end
-text(objLoc3D(:,1),objLoc3D(:,2),objLoc3D(:,3),textlabel);
 view(3); axis equal;
 
-for i=1:8
-    for j=i+1:8
-        if ismember(i,[1,5,6,7,8])&ismember(j,[1,5,6,7,8])
-            distViaMid(i,j)=sqrt(sum((objLoc3D(i,:)-objLoc3D(j,:)).^2,2));
-        else
-            
-            if ~isempty(midpoint{i,j})
-                plot3([objLoc3D(i,1),midpoint{i,j}(1),objLoc3D(j,1)],[objLoc3D(i,2),midpoint{i,j}(2),objLoc3D(j,2)],[objLoc3D(i,3),midpoint{i,j}(3),objLoc3D(j,3)]);
-                
-                distViaMid(i,j)=sqrt(sum((objLoc3D(i,:)-midpoint{i,j}).^2,2))+sqrt(sum((objLoc3D(j,:)-midpoint{i,j}).^2,2));
-            
-            else
-                plot3([objLoc3D(i,1),objLoc3D(j,1)],[objLoc3D(i,2),objLoc3D(j,2)],[objLoc3D(i,3),objLoc3D(j,3)]);
-                distViaMid(i,j)=sqrt(sum((objLoc3D(i,:)-objLoc3D(j,:)).^2,2));
-            end
-        end
-    end
-end
-
-for i=1:8
-    for j=i+1:8
-        distMat2D(i,j)=sqrt(sum((objLoc2D(i,:)-objLoc2D(j,:)).^2,2));
-        distMat3D(i,j)=sqrt(sum((objLoc3D(i,:)-objLoc3D(j,:)).^2,2));
-    end
-end
-tmp=distMat2D(distMat2D>0);
-tmp2=distMat3D(distMat3D>0);
-tmp3=distViaMid(distViaMid>0);
-
+selectpoints=1:3:length(tmpidx); %only display every 3rd timepoints to reduce clutter
+plot3(tmptraj3D(1,selectpoints),tmptraj3D(2,selectpoints),tmptraj3D(3,selectpoints),'k');% trajectory of the center of the mass
+plot3([tmptraj3D(1,selectpoints);tmptraj3D(1,selectpoints)+arrowCamera(1,selectpoints)], [tmptraj3D(2,selectpoints);tmptraj3D(2,selectpoints)+arrowCamera(2,selectpoints)], [tmptraj3D(3,selectpoints);tmptraj3D(3,selectpoints)+arrowCamera(3,selectpoints)],'Color','b','LineStyle','-'); % show the forward facing vector
 ##### SOURCE END #####
 --></body></html>
