@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>mainAnalysis_public</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-04-21"><meta name="DC.source" content="mainAnalysis_public.m"><style type="text/css">
+      --><title>mainAnalysis_public</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-07-21"><meta name="DC.source" content="mainAnalysis_public.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Introduction</a></li><li><a href="#2">Load data</a></li><li><a href="#3">Check demographic information (Method/Participants section)</a></li><li><a href="#4">Duration of experiment (Method/Task section)</a></li><li><a href="#5">Object-location memory: result (Exp1/2/3 result section)</a></li><li><a href="#6">Visualise the final object drop location (Fig.2,5,supple Fig.3)</a></li><li><a href="#7">check the positional bias in the centre object (Exp1 Result Section1)</a></li><li><a href="#8">distance estimation task: comparison task (Fig.3,4,6)</a></li><li><a href="#9">distance estimation task: slider (Fig.3,4,6)</a></li><li><a href="#10">Debrief analysis (Result section)</a></li></ul></div><h2 id="1">Introduction</h2><p>This is analysis script for my series of spatial memory experiment on the non-flat surface.</p><p>Participants learned 8 objects location inside the virtual environment (Unity WebGL)and then estimated the inter-object distances. I mainly compared the distance estimate for the flat and curved part to test whether path and 3D Euclidean distance can be retrieved correctly or interacts each other. Path distance is related to a surface-based map and Euclid distane is related to a volumetric 3D map.</p><p>Reference: Kim and Doeller (bioRxiv)_XX. doi:XX Dr. Misun Kim (<a href="mailto:mkim@cbs.mpg.de">mkim@cbs.mpg.de</a>)</p><pre class="codeinput">clear; close <span class="string">all</span>;clc;
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Introduction</a></li><li><a href="#2">Load data</a></li><li><a href="#3">Check demographic information (Method/Participants section)</a></li><li><a href="#4">Duration of experiment (Method/Task section)</a></li><li><a href="#5">Object-location memory: result (Exp1/2/3 result section)</a></li><li><a href="#6">Visualise the final object drop location (Fig.2,5,supple Fig.3)</a></li><li><a href="#7">check the positional bias in the centre object (Exp1 Result Section1)</a></li><li><a href="#8">distance estimation task: comparison task (Fig.3,4,6)</a></li><li><a href="#9">distance estimation task: slider (Fig.3,4,6)</a></li><li><a href="#10">Debrief analysis (Result section)</a></li></ul></div><h2 id="1">Introduction</h2><p>This is analysis script for my series of spatial memory experiment on the non-flat surface.</p><p>Participants learned 8 objects location inside the virtual environment (Unity WebGL)and then estimated the inter-object distances. I mainly compared the distance estimate for the flat and curved part to test whether path and 3D Euclidean distance can be retrieved correctly or interacts each other. Path distance is related to a surface-based map and Euclid distane is related to a volumetric 3D map.</p><p>Reference: Kim and Doeller (bioRxiv)_XX. doi:XX 21/04/2021, Dr. Misun Kim (<a href="mailto:mkim@cbs.mpg.de">mkim@cbs.mpg.de</a>)</p><pre class="codeinput">clear; close <span class="string">all</span>;clc;
 </pre><h2 id="2">Load data</h2><div><ul><li>I collated all behavioural results (each tasks, version of experiment, participants) into MATLAB struct variable in .mat files.</li><li>Load these files into workspace</li></ul></div><pre class="codeinput">expName={<span class="string">'drive+Path'</span>,<span class="string">'drive+Euclid'</span>,<span class="string">'drivelook+Path'</span>,<span class="string">'drivelook+Euclid'</span>,<span class="string">'fly+Euclid'</span>};
 <span class="keyword">for</span> i=1:5
     load(sprintf(<span class="string">'../data/data_%s.mat'</span>,expName{i}),<span class="string">'alldata'</span>);
@@ -361,40 +361,45 @@ driving/looking exp, drop location: dist_curve=0.92+0.06 vs. dist_linear=0.89+0.
 
     <span class="keyword">end</span>
 
+    goodsublist_distcomp{ver}=accu_trivial&gt;50;
+    tmpsublist=goodsublist_objloc{ver}&amp;goodsublist_distcomp{ver};<span class="comment">% those who passed the object-location criteria &amp; dist comparison task sanity check</span>
+
     <span class="comment">% display accuracy for trivial trials, exclude those who didn't remember the object location well (goodsublist_objloc)</span>
-    fprintf(<span class="string">'\n%s, accu trivial=%.3f+%.3f, n=%d out of %d above chance accuracy\n'</span>,expName{ver}, mean(accu_trivial(goodsublist_objloc{ver})),std(accu_trivial(goodsublist_objloc{ver})), nnz(goodsublist_objloc{ver}&amp;accu_trivial&gt;0.5),nnz(goodsublist_objloc{ver}));
+    fprintf(<span class="string">'\n%s, accu trivial=%.3f+%.3f, n=%d out of %d above chance accuracy\n'</span>,expName{ver}, mean(accu_trivial(goodsublist_objloc{ver})),std(accu_trivial(goodsublist_objloc{ver})), nnz(tmpsublist),nnz(goodsublist_objloc{ver}));
+
 
     <span class="comment">% stat for curve&lt;linear (I use non-parametric sign-rank test because the normality</span>
     <span class="comment">% assumption was not met, probably due to discretness of the response and the wide range of values from 0 to 100%)</span>
-    rateCurveShorter=accu_diagnostic(goodsublist_objloc{ver}&amp;accu_trivial&gt;50);
+    rateCurveShorter=accu_diagnostic(tmpsublist);
     [p,h,st]=signrank(rateCurveShorter,50,<span class="string">'tail'</span>,<span class="string">'right'</span>,<span class="string">'Method'</span>,<span class="string">'approximate'</span>);
-    fprintf(<span class="string">'curve&lt;linear=%.1f+%.1f%%,sign-rank test, p=%.3f, Z=%.1f \n'</span>,mean(rateCurveShorter),std(rateCurveShorter), p, st.zval);
+    fprintf(<span class="string">'curve&lt;linear=%.1f+%.1f%%,sign-rank test, p=%.3f, Z=%.1f, n=%d \n'</span>,mean(rateCurveShorter),std(rateCurveShorter), p, st.zval, length(rateCurveShorter));
 
     <span class="comment">% display accuracy for curve&lt;linear, include only those who passed the sanity check</span>
     option=[];option.plotdot=4;option.compareToConst=50;
     option.showpval=0;option.markersize=3;option.ticklabel={<span class="string">''</span>};option.barwidth=0.4;
+
     f1=figure(<span class="string">'Units'</span>,<span class="string">'centimeters'</span>,<span class="string">'Position'</span>,[20 20 2.5 4]);
-    ttestplotMK2(accu_diagnostic(goodsublist_objloc{ver}&amp;accu_trivial&gt;50),option);
+    ttestplotMK2(accu_diagnostic(tmpsublist),option);
     set(gca,<span class="string">'ytick'</span>,[0,50,100],<span class="string">'FontSize'</span>,8);
     hold <span class="string">on</span>;plot([0,2],[50,50],<span class="string">'r'</span>);ylim([-5, 120]); ylabel(<span class="string">'response (%)'</span>); title(<span class="string">''</span>);
     xlabel(<span class="string">'curve&lt;linear'</span>);
     title(expName{ver});<span class="comment">%add exp name for markdown</span>
 <span class="keyword">end</span>
 </pre><pre class="codeoutput">
-drive+Path, accu trivial=83.784+17.145, n=37 out of 37 above chance accuracy
-curve&lt;linear=64.4+32.8%,sign-rank test, p=0.013, Z=2.2 
+drive+Path, accu trivial=83.784+17.145, n=33 out of 37 above chance accuracy
+curve&lt;linear=64.4+32.8%,sign-rank test, p=0.013, Z=2.2, n=33 
 
-drive+Euclid, accu trivial=85.473+17.558, n=37 out of 37 above chance accuracy
-curve&lt;linear=71.2+31.9%,sign-rank test, p=0.001, Z=3.2 
+drive+Euclid, accu trivial=85.473+17.558, n=33 out of 37 above chance accuracy
+curve&lt;linear=71.2+31.9%,sign-rank test, p=0.001, Z=3.2, n=33 
 
-drivelook+Path, accu trivial=86.513+18.238, n=38 out of 38 above chance accuracy
-curve&lt;linear=62.1+40.8%,sign-rank test, p=0.051, Z=1.6 
+drivelook+Path, accu trivial=86.513+18.238, n=35 out of 38 above chance accuracy
+curve&lt;linear=62.1+40.8%,sign-rank test, p=0.051, Z=1.6, n=35 
 
-drivelook+Euclid, accu trivial=91.786+13.539, n=35 out of 35 above chance accuracy
-curve&lt;linear=77.7+31.1%,sign-rank test, p=0.000, Z=3.5 
+drivelook+Euclid, accu trivial=91.786+13.539, n=33 out of 35 above chance accuracy
+curve&lt;linear=77.7+31.1%,sign-rank test, p=0.000, Z=3.5, n=33 
 
-fly+Euclid, accu trivial=88.929+16.817, n=35 out of 35 above chance accuracy
-curve&lt;linear=81.6+27.6%,sign-rank test, p=0.000, Z=4.4 
+fly+Euclid, accu trivial=88.929+16.817, n=34 out of 35 above chance accuracy
+curve&lt;linear=81.6+27.6%,sign-rank test, p=0.000, Z=4.4, n=34 
 </pre><img vspace="5" hspace="5" src="mainAnalysis_public_06.png" alt=""> <img vspace="5" hspace="5" src="mainAnalysis_public_07.png" alt=""> <img vspace="5" hspace="5" src="mainAnalysis_public_08.png" alt=""> <img vspace="5" hspace="5" src="mainAnalysis_public_09.png" alt=""> <img vspace="5" hspace="5" src="mainAnalysis_public_10.png" alt=""> <h2 id="9">distance estimation task: slider (Fig.3,4,6)</h2><div><ul><li>First, check within-subject response reliability and exclude a few subjects who had not reliably performed the task</li><li>Using all distance pair, calculate the correlation between the subjective distance and true distances</li><li>Main analysis: Compare the distance estimate for the key linear and curve distance pairs</li></ul></div><pre class="codeinput"><span class="keyword">for</span> ver=1:5
     alldata=behAll{ver};
     estDistPair_1st=zeros(8*7/2,length(alldata));
@@ -448,12 +453,13 @@ curve&lt;linear=81.6+27.6%,sign-rank test, p=0.000, Z=4.4
     <span class="keyword">end</span>
    goodsublist_slider=withinSubReliability(:,2)&lt;0.05;<span class="comment">% within-subject correlation is high, p&lt;0.05</span>
 
-   tmpsublist=goodsublist_objloc{ver}&amp;goodsublist_slider;<span class="comment">%only include those who remembered all 8 objects well and who showed reliable distance estimation performance</span>
+<span class="comment">%    tmpsublist=goodsublist_objloc{ver}&amp;goodsublist_slider;%only include those who remembered all 8 objects well and who showed reliable distance estimation performance</span>
+   tmpsublist=goodsublist_objloc{ver};<span class="comment">%only include those who remembered all 8 objects well</span>
 
    saveCorrSummary{ver}=corrSum(tmpsublist,:);
    <span class="comment">% display result for within-subject reliability and overall fit to the</span>
    <span class="comment">% true 2D/3D distance</span>
-   fprintf(<span class="string">'\n%s, within-subject reliability, r=%.3f+%.3f, n=%d out of %d reliability criteria (p&lt;0.05) \n'</span>,expName{ver},mean(withinSubReliability(goodsublist_objloc{ver},1)),std(withinSubReliability(goodsublist_objloc{ver},1)), nnz(tmpsublist), nnz(goodsublist_objloc{ver}));
+   fprintf(<span class="string">'\n%s, within-subject reliability, r=%.3f+%.3f, n=%d out of %d with p&lt;0.05 \n'</span>,expName{ver},mean(withinSubReliability(goodsublist_objloc{ver},1)),std(withinSubReliability(goodsublist_objloc{ver},1)), nnz(goodsublist_objloc{ver}&amp;withinSubReliability(:,2)&lt;0.05), nnz(goodsublist_objloc{ver}));
    fprintf(<span class="string">'%s, spearman corr(est,2D dist), rho=%.3f+%.3f \n'</span>,expName{ver},mean(corrSum(tmpsublist,2)),std(corrSum(tmpsublist,2)));
    fprintf(<span class="string">'%s, spearman corr(est,3D dist), rho=%.3f+%.3f \n'</span>,expName{ver},mean(corrSum(tmpsublist,1)),std(corrSum(tmpsublist,1)));
 <span class="comment">%    fprintf('%s, spearman corr(est,midpass dist), rho=%.3f+%.3f \n',expName{ver},mean(corrSum(tmpsublist,3)),std(corrSum(tmpsublist,3)));</span>
@@ -464,7 +470,7 @@ curve&lt;linear=81.6+27.6%,sign-rank test, p=0.000, Z=4.4
     tmplinear=keyDistPair{ver}(tmpsublist,2);
     [h,p,~,st]=ttest(tmpcurve,tmplinear,<span class="string">'tail'</span>,<span class="string">'left'</span>);
     fprintf(<span class="string">'curve=%.3f+%.3f vs. linear=%.3f+%.3f,t(%d)=%.1f, p=%.3f \n'</span>,mean(tmpcurve),std(tmpcurve),mean(tmplinear),std(tmplinear),st.df, st.tstat,p);
-
+    fprintf(<span class="string">'median curve/linear ratio=%.3f, interquartile=%.3f\n'</span>,median(tmpcurve./tmplinear),iqr(tmpcurve./tmplinear));
     <span class="comment">% display overall fit between the all pairwise distance estimate and</span>
     <span class="comment">% true 2D or 3D distance estimatet</span>
     fl=figure(<span class="string">'Units'</span>,<span class="string">'centimeters'</span>,<span class="string">'Position'</span>,[20 20 8 4]);
@@ -491,30 +497,35 @@ curve&lt;linear=81.6+27.6%,sign-rank test, p=0.000, Z=4.4
 
 <span class="keyword">end</span>
 </pre><pre class="codeoutput">
-drive+Path, within-subject reliability, r=0.740+0.201, n=34 out of 37 reliability criteria (p&lt;0.05) 
-drive+Path, spearman corr(est,2D dist), rho=0.734+0.203 
-drive+Path, spearman corr(est,3D dist), rho=0.461+0.192 
-curve=0.421+0.126 vs. linear=0.478+0.107,t(33)=-1.9, p=0.036 
+drive+Path, within-subject reliability, r=0.740+0.201, n=34 out of 37 with p&lt;0.05 
+drive+Path, spearman corr(est,2D dist), rho=0.694+0.255 
+drive+Path, spearman corr(est,3D dist), rho=0.438+0.212 
+curve=0.435+0.133 vs. linear=0.485+0.112,t(36)=-1.7, p=0.045 
+median curve/linear ratio=0.981, interquartile=0.406
 
-drive+Euclid, within-subject reliability, r=0.631+0.312, n=31 out of 37 reliability criteria (p&lt;0.05) 
-drive+Euclid, spearman corr(est,2D dist), rho=0.687+0.208 
-drive+Euclid, spearman corr(est,3D dist), rho=0.430+0.236 
-curve=0.407+0.162 vs. linear=0.443+0.120,t(30)=-0.9, p=0.194 
+drive+Euclid, within-subject reliability, r=0.631+0.312, n=31 out of 37 with p&lt;0.05 
+drive+Euclid, spearman corr(est,2D dist), rho=0.598+0.309 
+drive+Euclid, spearman corr(est,3D dist), rho=0.379+0.251 
+curve=0.419+0.153 vs. linear=0.458+0.126,t(36)=-1.1, p=0.148 
+median curve/linear ratio=0.888, interquartile=0.517
 
-drivelook+Path, within-subject reliability, r=0.701+0.216, n=34 out of 38 reliability criteria (p&lt;0.05) 
-drivelook+Path, spearman corr(est,2D dist), rho=0.736+0.216 
-drivelook+Path, spearman corr(est,3D dist), rho=0.463+0.214 
-curve=0.414+0.136 vs. linear=0.445+0.100,t(33)=-1.1, p=0.137 
+drivelook+Path, within-subject reliability, r=0.701+0.216, n=34 out of 38 with p&lt;0.05 
+drivelook+Path, spearman corr(est,2D dist), rho=0.648+0.336 
+drivelook+Path, spearman corr(est,3D dist), rho=0.403+0.272 
+curve=0.425+0.137 vs. linear=0.452+0.099,t(37)=-1.0, p=0.152 
+median curve/linear ratio=0.949, interquartile=0.487
 
-drivelook+Euclid, within-subject reliability, r=0.661+0.264, n=30 out of 35 reliability criteria (p&lt;0.05) 
-drivelook+Euclid, spearman corr(est,2D dist), rho=0.773+0.116 
-drivelook+Euclid, spearman corr(est,3D dist), rho=0.559+0.205 
-curve=0.348+0.178 vs. linear=0.452+0.126,t(29)=-2.3, p=0.016 
+drivelook+Euclid, within-subject reliability, r=0.661+0.264, n=30 out of 35 with p&lt;0.05 
+drivelook+Euclid, spearman corr(est,2D dist), rho=0.692+0.243 
+drivelook+Euclid, spearman corr(est,3D dist), rho=0.493+0.260 
+curve=0.354+0.178 vs. linear=0.451+0.124,t(34)=-2.3, p=0.014 
+median curve/linear ratio=0.789, interquartile=0.490
 
-fly+Euclid, within-subject reliability, r=0.614+0.358, n=29 out of 35 reliability criteria (p&lt;0.05) 
-fly+Euclid, spearman corr(est,2D dist), rho=0.655+0.215 
-fly+Euclid, spearman corr(est,3D dist), rho=0.551+0.225 
-curve=0.327+0.154 vs. linear=0.587+0.169,t(28)=-5.5, p=0.000 
+fly+Euclid, within-subject reliability, r=0.614+0.358, n=29 out of 35 with p&lt;0.05 
+fly+Euclid, spearman corr(est,2D dist), rho=0.580+0.281 
+fly+Euclid, spearman corr(est,3D dist), rho=0.488+0.263 
+curve=0.351+0.152 vs. linear=0.571+0.163,t(34)=-5.2, p=0.000 
+median curve/linear ratio=0.571, interquartile=0.455
 </pre><img vspace="5" hspace="5" src="mainAnalysis_public_11.png" alt=""> <img vspace="5" hspace="5" src="mainAnalysis_public_12.png" alt=""> <img vspace="5" hspace="5" src="mainAnalysis_public_13.png" alt=""> <img vspace="5" hspace="5" src="mainAnalysis_public_14.png" alt=""> <img vspace="5" hspace="5" src="mainAnalysis_public_15.png" alt=""> <h2 id="10">Debrief analysis (Result section)</h2><div><ul><li>Count the number of response for strategy-related question during the debrief at the end of the experiment</li><li>Other debrief questions can be also found in alldata.debrief fields</li><li>Note that questions and options were slightly different for each version of the experiment</li></ul></div><pre class="codeinput">optionlist_Q5{1}={<span class="string">'first-person'</span>,<span class="string">'map of 3D'</span>,<span class="string">'rather a simple, flat map'</span>};<span class="comment">% keyword in the option for distrance estimatino strategy question in drive+path group</span>
 optionlist_Q5{2}={<span class="string">'first-person'</span>,<span class="string">'3rd-person'</span>,<span class="string">'between the two'</span>};<span class="comment">%keyword for drive+Euclid group, I didn't include the 2D map option</span>
 optionlist_Q5{3}={<span class="string">'first-person'</span>,<span class="string">'3D'</span>,<span class="string">'2D'</span>};<span class="comment">% keyword for drive/look + path  group</span>
@@ -544,7 +555,7 @@ drive+Euclid, first-person=32.4%,3rd-person=43.2%, between the two=24.3%,
 drivelook+Path, first-person=36.8%,3D=44.7%, 2D=18.4%,
 drivelook+Euclid, first-person=28.6%,3D=54.3%, 2D=17.1%,
 fly+Euclid, first-person=40.0%,3D=60.0%,
-</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Introduction
 % This is analysis script for my series of spatial memory experiment on
@@ -557,7 +568,7 @@ fly+Euclid, first-person=40.0%,3D=60.0%,
 % Euclid distane is related to a volumetric 3D map.
 %
 % Reference: Kim and Doeller (bioRxiv)_XX. doi:XX
-% Dr. Misun Kim (mkim@cbs.mpg.de)
+% 21/04/2021, Dr. Misun Kim (mkim@cbs.mpg.de)
 
 clear; close all;clc;
 %% Load data
@@ -850,20 +861,25 @@ for ver=1:5
         
     end
     
+    goodsublist_distcomp{ver}=accu_trivial>50;
+    tmpsublist=goodsublist_objloc{ver}&goodsublist_distcomp{ver};% those who passed the object-location criteria & dist comparison task sanity check
+    
     % display accuracy for trivial trials, exclude those who didn't remember the object location well (goodsublist_objloc)
-    fprintf('\n%s, accu trivial=%.3f+%.3f, n=%d out of %d above chance accuracy\n',expName{ver}, mean(accu_trivial(goodsublist_objloc{ver})),std(accu_trivial(goodsublist_objloc{ver})), nnz(goodsublist_objloc{ver}&accu_trivial>0.5),nnz(goodsublist_objloc{ver}));
+    fprintf('\n%s, accu trivial=%.3f+%.3f, n=%d out of %d above chance accuracy\n',expName{ver}, mean(accu_trivial(goodsublist_objloc{ver})),std(accu_trivial(goodsublist_objloc{ver})), nnz(tmpsublist),nnz(goodsublist_objloc{ver}));
+    
     
     % stat for curve<linear (I use non-parametric sign-rank test because the normality
     % assumption was not met, probably due to discretness of the response and the wide range of values from 0 to 100%)
-    rateCurveShorter=accu_diagnostic(goodsublist_objloc{ver}&accu_trivial>50);
+    rateCurveShorter=accu_diagnostic(tmpsublist);
     [p,h,st]=signrank(rateCurveShorter,50,'tail','right','Method','approximate');
-    fprintf('curve<linear=%.1f+%.1f%%,sign-rank test, p=%.3f, Z=%.1f \n',mean(rateCurveShorter),std(rateCurveShorter), p, st.zval);
+    fprintf('curve<linear=%.1f+%.1f%%,sign-rank test, p=%.3f, Z=%.1f, n=%d \n',mean(rateCurveShorter),std(rateCurveShorter), p, st.zval, length(rateCurveShorter));
 
     % display accuracy for curve<linear, include only those who passed the sanity check
     option=[];option.plotdot=4;option.compareToConst=50; 
     option.showpval=0;option.markersize=3;option.ticklabel={''};option.barwidth=0.4;
+    
     f1=figure('Units','centimeters','Position',[20 20 2.5 4]); 
-    ttestplotMK2(accu_diagnostic(goodsublist_objloc{ver}&accu_trivial>50),option);
+    ttestplotMK2(accu_diagnostic(tmpsublist),option);
     set(gca,'ytick',[0,50,100],'FontSize',8);
     hold on;plot([0,2],[50,50],'r');ylim([-5, 120]); ylabel('response (%)'); title('');
     xlabel('curve<linear');
@@ -930,12 +946,13 @@ for ver=1:5
     end
    goodsublist_slider=withinSubReliability(:,2)<0.05;% within-subject correlation is high, p<0.05 
    
-   tmpsublist=goodsublist_objloc{ver}&goodsublist_slider;%only include those who remembered all 8 objects well and who showed reliable distance estimation performance
+%    tmpsublist=goodsublist_objloc{ver}&goodsublist_slider;%only include those who remembered all 8 objects well and who showed reliable distance estimation performance
+   tmpsublist=goodsublist_objloc{ver};%only include those who remembered all 8 objects well
     
    saveCorrSummary{ver}=corrSum(tmpsublist,:);
    % display result for within-subject reliability and overall fit to the
    % true 2D/3D distance
-   fprintf('\n%s, within-subject reliability, r=%.3f+%.3f, n=%d out of %d reliability criteria (p<0.05) \n',expName{ver},mean(withinSubReliability(goodsublist_objloc{ver},1)),std(withinSubReliability(goodsublist_objloc{ver},1)), nnz(tmpsublist), nnz(goodsublist_objloc{ver}));  
+   fprintf('\n%s, within-subject reliability, r=%.3f+%.3f, n=%d out of %d with p<0.05 \n',expName{ver},mean(withinSubReliability(goodsublist_objloc{ver},1)),std(withinSubReliability(goodsublist_objloc{ver},1)), nnz(goodsublist_objloc{ver}&withinSubReliability(:,2)<0.05), nnz(goodsublist_objloc{ver}));  
    fprintf('%s, spearman corr(est,2D dist), rho=%.3f+%.3f \n',expName{ver},mean(corrSum(tmpsublist,2)),std(corrSum(tmpsublist,2)));  
    fprintf('%s, spearman corr(est,3D dist), rho=%.3f+%.3f \n',expName{ver},mean(corrSum(tmpsublist,1)),std(corrSum(tmpsublist,1)));  
 %    fprintf('%s, spearman corr(est,midpass dist), rho=%.3f+%.3f \n',expName{ver},mean(corrSum(tmpsublist,3)),std(corrSum(tmpsublist,3)));  
@@ -946,7 +963,7 @@ for ver=1:5
     tmplinear=keyDistPair{ver}(tmpsublist,2);
     [h,p,~,st]=ttest(tmpcurve,tmplinear,'tail','left');
     fprintf('curve=%.3f+%.3f vs. linear=%.3f+%.3f,t(%d)=%.1f, p=%.3f \n',mean(tmpcurve),std(tmpcurve),mean(tmplinear),std(tmplinear),st.df, st.tstat,p);
-
+    fprintf('median curve/linear ratio=%.3f, interquartile=%.3f\n',median(tmpcurve./tmplinear),iqr(tmpcurve./tmplinear));
     % display overall fit between the all pairwise distance estimate and
     % true 2D or 3D distance estimatet
     fl=figure('Units','centimeters','Position',[20 20 8 4]);
