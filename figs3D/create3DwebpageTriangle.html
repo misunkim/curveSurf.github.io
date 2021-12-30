@@ -1,0 +1,460 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>create3DwebpageTriangle</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-12-30"><meta name="DC.source" content="create3DwebpageTriangle.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">create interactive webpage of 3D trajectories</a></li><li><a href="#2">Load behaviour data txt files</a></li><li><a href="#3">preprocessing inbound turn angle so that it ranges between [-180,180]</a></li><li><a href="#4">preprocess inbound distance because of a rare case where a wrong distance was logeged</a></li><li><a href="#5">sort the trials by same shape and collapse left/right symmetry</a></li><li><a href="#6">calculate the ideal turn angle and distance</a></li><li><a href="#7">calculate distance error relative to spherical and planar solution</a></li><li><a href="#8">to be deleted (something is wrong with this participant. saved azi,pit of the returned is completely different from coordinates reconstructed from turn angle and distance</a></li></ul></div><h2 id="1">create interactive webpage of 3D trajectories</h2><p>for presentation purpose 2021.12.30 MK</p><pre class="codeinput">close <span class="string">all</span>;
+clear;
+clc;
+
+[basesph_x,basesph_y,basesph_z]=sphere(20); <span class="comment">%prepare a base sphere</span>
+</pre><h2 id="2">Load behaviour data txt files</h2><pre class="codeinput">rootdir=<span class="string">'../behData'</span>;
+subId_list={<span class="string">'psub00'</span>,<span class="string">'psub01'</span>,<span class="string">'psub02'</span>,<span class="string">'psub03'</span>,<span class="string">'psub04'</span>,<span class="string">'psub05'</span>};<span class="comment">% change in triangle shape from previous subject</span>
+
+rawdata_sph=[];
+rawdata_plane=[];
+<span class="keyword">for</span> sub=1:length(subId_list)
+    subId=subId_list{sub};
+    behdir=[rootdir,filesep,subId,filesep,<span class="string">'sphere'</span>];
+    fn=dir(sprintf(<span class="string">'%s/*triangleTestSum*'</span>,behdir));
+    <span class="keyword">for</span> run=1:length(fn)
+        tmpdata=readtable([behdir,filesep,fn(run).name],<span class="string">'filetype'</span>,<span class="string">'text'</span>);
+        tmpdata.sub=sub*ones(size(tmpdata,1),1);
+        tmpdata.run=run*ones(size(tmpdata,1),1);
+        rawdata_sph=[rawdata_sph;tmpdata];
+    <span class="keyword">end</span>
+    behdir=[rootdir,filesep,subId,filesep,<span class="string">'plane'</span>];
+    fn=dir(sprintf(<span class="string">'%s/*trianglePlaneTestSum*'</span>,behdir));
+    <span class="keyword">for</span> run=1:length(fn)
+        tmpdata=readtable([behdir,filesep,fn(run).name],<span class="string">'filetype'</span>,<span class="string">'text'</span>);
+        tmpdata.sub=sub*ones(size(tmpdata,1),1);
+        tmpdata.run=run*ones(size(tmpdata,1),1);
+        rawdata_plane=[rawdata_plane;tmpdata];
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2 id="3">preprocessing inbound turn angle so that it ranges between [-180,180]</h2><p>inbound turn angle saved from Unity is between -360 to 360deg, to make it easier to analyse, I calculated the angle as between -180 and 180deg</p><pre class="codeinput">rawdata_sph.inboundTurnInDeg(rawdata_sph.inboundTurnInDeg&gt;180)=rawdata_sph.inboundTurnInDeg(rawdata_sph.inboundTurnInDeg&gt;180)-360;
+rawdata_sph.inboundTurnInDeg(rawdata_sph.inboundTurnInDeg&lt;-180)=rawdata_sph.inboundTurnInDeg(rawdata_sph.inboundTurnInDeg&lt;-180)+360;
+rawdata_plane.inboundTurnInDeg(rawdata_plane.inboundTurnInDeg&gt;180)=rawdata_plane.inboundTurnInDeg(rawdata_plane.inboundTurnInDeg&gt;180)-360;
+rawdata_plane.inboundTurnInDeg(rawdata_plane.inboundTurnInDeg&lt;-180)=rawdata_plane.inboundTurnInDeg(rawdata_plane.inboundTurnInDeg&lt;-180)+360;
+
+<span class="comment">% also calculate the absolute distance error from the origin</span>
+rawdata_plane.absErrorInDeg=sqrt((rawdata_plane.returned_XInDeg).^2+(rawdata_plane.returned_YInDeg).^2);
+
+returned_cart=sph2cartMKunity(rawdata_sph.returned_aziInDeg,rawdata_sph.returned_pitInDeg);
+start_cart=sph2cartMKunity(rawdata_sph.pos1_aziInDeg,rawdata_sph.pos1_pitInDeg);
+<span class="keyword">for</span> i=1:length(returned_cart)
+    arclen(i,1)=acosd(dot(returned_cart(i,:),start_cart(i,:)));
+<span class="keyword">end</span>
+rawdata_sph.absErrorInDeg=arclen;
+</pre><h2 id="4">preprocess inbound distance because of a rare case where a wrong distance was logeged</h2><p>normally, saved end position (returned_aziInDeg,returned_pitInDeg) should match with the estimated end position by adding 3 legs (using dist1InDeg,dist2InDeg, turnangInDeg, inboundDistInDeg, inboundTurnInDeg) however,in the early version of Unity script (psub00-psub05), I computed the inboundDistInDeg by geodesic distance between the two locations so when a participant move &gt;180deg, the distance is saved as 360-X (e.g. dist of 240deg becomes 120deg) which caused a large discrepancy between the end position and reconstructed position I can fix the inboundDistInDistance for such cases</p><pre class="codeinput">distBtwDeadreckonActual=zeros(size(rawdata_sph,1),1);<span class="comment">%discrepancy between the saved end position, and the position calculated by adding up 3 legs</span>
+<span class="keyword">for</span> trial=1:size(rawdata_sph,1)
+    tmpstate1=[0,0,0]; <span class="comment">%azi,pit,theta in radian for starting position</span>
+    tmpstate2=translateOnSphere(0,0,0,rawdata_sph.dist1InDeg(trial)*pi/180); <span class="comment">% end of first leg</span>
+    tmpstate3=translateOnSphere(tmpstate2(1),tmpstate2(2),tmpstate2(3)+rawdata_sph.turnangInDeg(trial)*pi/180,rawdata_sph.dist2InDeg(trial)*pi/180); <span class="comment">% end of second leg</span>
+    tmpstate4=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+rawdata_sph.inboundTurnInDeg(trial)*pi/180,rawdata_sph.inboundDistInDeg(trial)*pi/180); <span class="comment">% end of inbound leg</span>
+
+    response_cart=sph2cartFn(tmpstate4(1),tmpstate4(2));
+    distBtwDeadreckonActual(trial,1)=acosd(dot(response_cart,sph2cartMKunity(rawdata_sph.returned_aziInDeg(trial),rawdata_sph.returned_pitInDeg(trial))));
+<span class="keyword">end</span>
+over180degTrial=distBtwDeadreckonActual&gt;50;
+rawdata_sph.inboundDistInDeg(over180degTrial)=360-rawdata_sph.inboundDistInDeg(over180degTrial);
+</pre><h2 id="5">sort the trials by same shape and collapse left/right symmetry</h2><p>first find unique triangle shape</p><pre class="codeinput">triangleShape=unique([rawdata_sph.dist1InDeg,rawdata_sph.dist2InDeg,rawdata_sph.turnangInDeg],<span class="string">'rows'</span>);
+triangleShape=sortrows(triangleShape,3,<span class="string">'descend'</span>);
+
+
+<span class="comment">% triangleShape(1,:)=[67.5,135,120];%dist1, dist2, turnang</span>
+<span class="comment">% triangleShape(2,:)=[45,135,90];%dist1, dist2, ang3</span>
+<span class="comment">% triangleShape(3,:)=[90,45,60];%on plan,e return angle=90deg large, dist is small, so I like to keep it to have a wide range of ideal planar homing vector (however, it is relatively small triangle, so sphere/plane dissociation is difficult)</span>
+<span class="comment">% triangleShape(4,:)=[135,67.5,60];%dist1, dist2, ang3</span>
+<span class="comment">% triangleShape(5,:)=[135,45,120];%dist1, dist2, ang3</span>
+<span class="comment">% triangleShape(6,:)=[135,90,90];%large triangle that can distinguish sph/plane, as well as good turning range for plane.</span>
+<span class="comment">% triangleShape(7,:)=[67.5,135,-120];%dist1, dist2, turnang</span>
+<span class="comment">% triangleShape(8,:)=[45,135,-90];%dist1, dist2, ang3</span>
+<span class="comment">% triangleShape(9,:)=[90,45,-60];%on plan,e return angle=90deg large, dist is small, so I like to keep it to have a wide range of ideal planar homing vector (however, it is relatively small triangle, so sphere/plane dissociation is difficult)</span>
+<span class="comment">% triangleShape(10,:)=[135,67.5,-60];%dist1, dist2, ang3</span>
+<span class="comment">% triangleShape(11,:)=[135,45,-120];%dist1, dist2, ang3</span>
+<span class="comment">% triangleShape(12,:)=[135,90,-90];%large triangle that can distinguish sph/plane, as well as good turning range for plane.</span>
+
+<span class="comment">% collapse left/right symmetric shape?</span>
+trial_leftturn=(rawdata_sph.turnangInDeg&lt;0);
+rawdata_sph.pos3_aziInDeg(trial_leftturn)=-rawdata_sph.pos3_aziInDeg(trial_leftturn);
+rawdata_sph.returned_aziInDeg(trial_leftturn)=-rawdata_sph.returned_aziInDeg(trial_leftturn);
+rawdata_sph.inboundTurnInDeg(trial_leftturn)=-rawdata_sph.inboundTurnInDeg(trial_leftturn);
+rawdata_sph.turnangInDeg(trial_leftturn)=-rawdata_sph.turnangInDeg(trial_leftturn);
+
+
+trial_leftturn=(rawdata_plane.turnangInDeg&lt;0);
+rawdata_plane.pos3_XInDeg(trial_leftturn)=-rawdata_plane.pos3_XInDeg(trial_leftturn);
+rawdata_plane.returned_XInDeg(trial_leftturn)=-rawdata_plane.returned_XInDeg(trial_leftturn);
+rawdata_plane.inboundTurnInDeg(trial_leftturn)=-rawdata_plane.inboundTurnInDeg(trial_leftturn);
+rawdata_plane.turnangInDeg(trial_leftturn)=-rawdata_plane.turnangInDeg(trial_leftturn);
+
+[~,shapeIdx_sph]=ismember([rawdata_sph.dist1InDeg,rawdata_sph.dist2InDeg,rawdata_sph.turnangInDeg],triangleShape,<span class="string">'rows'</span>);
+[~,shapeIdx_plane]=ismember([rawdata_plane.dist1InDeg,rawdata_plane.dist2InDeg,rawdata_plane.turnangInDeg],triangleShape,<span class="string">'rows'</span>);
+</pre><h2 id="6">calculate the ideal turn angle and distance</h2><pre class="codeinput">leg1InDeg=[];leg2InDeg=[];turnInDeg=[];sph_inboundDistInDeg=[];sph_inboundTurnInDeg=[];plane_inboundDistInDeg=[];plane_inboundTurnInDeg=[];
+<span class="keyword">for</span> i=1:size(triangleShape,1);
+    dist1=deg2rad(triangleShape(i,1));
+    dist2=deg2rad(triangleShape(i,2));
+    ang3=deg2rad(180-triangleShape(i,3));
+    <span class="comment">% 1)spherical case: sin(b)sin(c)cos(A)=cos(a)-cos(c)cos(b) // cosine rule for side</span>
+    dist3_sph=acos(sin(dist1)*sin(dist2)*cos(ang3)+cos(dist1)*cos(dist2)); <span class="comment">%arclength of inbound leg using the cosine rule</span>
+    ang1_sph=acos((cos(dist1)-cos(dist2)*cos(dist3_sph))/sin(dist2)/sin(dist3_sph));
+    ang2_sph=acos((cos(dist2)-cos(dist1)*cos(dist3_sph))/sin(dist1)/sin(dist3_sph));
+    <span class="comment">%inboundturn_sph=pi-ang1_sph;</span>
+
+    <span class="comment">% 2)planar case: c^2=a^2+b^2-2*a*b*cos(C);</span>
+    dist3_plane=sqrt(dist1^2+dist2^2-2*dist1*dist2*cos(ang3));
+    ang1_plane=acos((dist2^2+dist3_plane^2-dist1^2)/2/dist2/dist3_plane);
+    ang2_plane=pi-ang1_plane-ang3;
+    <span class="comment">%inboundturn_plane=pi_ang1;</span>
+
+    leg1InDeg(i,1)=triangleShape(i,1);
+    leg2InDeg(i,1)=triangleShape(i,2);
+    turnInDeg(i,1)=triangleShape(i,3);
+
+    sph_inboundDistInDeg(i,1)=rad2deg(dist3_sph);
+    sph_inboundTurnInDeg(i,1)=rad2deg(pi-ang1_sph);
+    plane_inboundDistInDeg(i,1)=rad2deg(dist3_plane);
+    plane_inboundTurnInDeg(i,1)=rad2deg(pi-ang1_plane);
+<span class="keyword">end</span>
+table_triangle=table(leg1InDeg,leg2InDeg,turnInDeg,sph_inboundDistInDeg,sph_inboundTurnInDeg,plane_inboundDistInDeg,plane_inboundTurnInDeg);
+</pre><h2 id="7">calculate distance error relative to spherical and planar solution</h2><p>also calculate the absolute distance error from the origin</p><pre class="codeinput">rawdata_plane.absErrorInDeg=sqrt((rawdata_plane.returned_XInDeg).^2+(rawdata_plane.returned_YInDeg).^2);
+
+returned_cart=sph2cartMKunity(rawdata_sph.returned_aziInDeg,rawdata_sph.returned_pitInDeg);
+start_cart=sph2cartMKunity(rawdata_sph.pos1_aziInDeg,rawdata_sph.pos1_pitInDeg);
+<span class="keyword">for</span> i=1:length(returned_cart)
+    arclen(i,1)=acosd(dot(returned_cart(i,:),start_cart(i,:)));
+<span class="keyword">end</span>
+rawdata_sph.absErrorInDeg=arclen;
+<span class="keyword">for</span> trial=1:size(rawdata_sph,1)
+    shape=shapeIdx_sph(trial);<span class="comment">% triangle shape idx for  given trial</span>
+    dist1=rawdata_sph.dist1InDeg(trial);dist2=rawdata_sph.dist2InDeg(trial);dist3=rawdata_sph.inboundDistInDeg(trial);
+    theta1=90;theta2=theta1-rawdata_sph.turnangInDeg(trial); theta3=theta2-rawdata_sph.inboundTurnInDeg(trial);
+    plane_pos(1,:)=[0,0];
+    plane_pos(2,:)=plane_pos(1,:)+dist1*[cosd(theta1),sind(theta1)];
+    plane_pos(3,:)=plane_pos(2,:)+dist2*[cosd(theta2),sind(theta2)];
+    plane_pos(4,:)=plane_pos(3,:)+dist3*[cosd(theta3),sind(theta3)];
+
+    theta_sph=theta2-table_triangle.sph_inboundTurnInDeg(shape);
+    plane_pos(5,:)=plane_pos(3,:)+table_triangle.sph_inboundDistInDeg(shape)*[cosd(theta_sph),sind(theta_sph)];
+
+    lenRelPlaneSol(trial,1)=sqrt(sum((plane_pos(4,:)-plane_pos(1,:)).^2));
+    lenRelSphSol(trial,1)=sqrt(sum((plane_pos(4,:)-plane_pos(5,:)).^2));
+
+    tmpstate1=[0,0,0];
+    tmpstate2=translateOnSphere(0,0,0,rawdata_sph.dist1InDeg(trial)*pi/180);
+    tmpstate3=translateOnSphere(tmpstate2(1),tmpstate2(2),tmpstate2(3)+rawdata_sph.turnangInDeg(trial)*pi/180,rawdata_sph.dist2InDeg(trial)*pi/180);
+    tmpstate4=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+rawdata_sph.inboundTurnInDeg(trial)*pi/180,rawdata_sph.inboundDistInDeg(trial)*pi/180);
+    tmpstate5=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+table_triangle.plane_inboundTurnInDeg(shape)*pi/180,table_triangle.plane_inboundDistInDeg(shape)*pi/180);
+    response_cart=sph2cartFn(tmpstate4(1),tmpstate4(2));
+    planeSol_cart=sph2cartFn(tmpstate5(1),tmpstate5(2));
+
+    sphSol_cart=sph2cartFn(tmpstate1(1),tmpstate1(2));
+    arclenRelPlaneSol(trial,1)=acosd(dot(response_cart,planeSol_cart));
+    arclenRelSphSol(trial,1)=acosd(dot(response_cart,sphSol_cart));
+
+<span class="keyword">end</span>
+rawdata_sph.arclenRelSphSol=arclenRelSphSol;
+rawdata_sph.arclenRelPlaneSol=arclenRelPlaneSol;
+rawdata_plane.lenRelSphSol=lenRelSphSol;
+rawdata_plane.lenRelPlaneSol=lenRelPlaneSol;
+
+option=[];option.plotdot=1;option.ticklabels={<span class="string">'sphSol'</span>,<span class="string">'planeSol'</span>};
+figure;
+subplot(1,2,1);ttestplotMK2([rawdata_sph.arclenRelSphSol,rawdata_sph.arclenRelPlaneSol],option); ylabel(<span class="string">'deviation on sphere'</span>);
+subplot(1,2,2);ttestplotMK2([rawdata_plane.lenRelSphSol,rawdata_plane.lenRelPlaneSol],option); ylabel(<span class="string">'deviation on plane'</span>);
+</pre><img vspace="5" hspace="5" src="create3DwebpageTriangle_01.png" alt=""> <h2 id="8">to be deleted (something is wrong with this participant. saved azi,pit of the returned is completely different from coordinates reconstructed from turn angle and distance</h2><pre class="codeinput">figure;
+
+
+h0=mesh(basesph_x,basesph_y,basesph_z,<span class="string">'FaceAlpha'</span>,0.5,<span class="string">'Edgecolor'</span>,<span class="string">'k'</span>);hold <span class="string">on</span>;
+               xlabel(<span class="string">'x'</span>);ylabel(<span class="string">'y'</span>);
+       tmpstate1=[0,0,0];
+        tmpstate2=translateOnSphere(0,0,0,rawdata_sph.dist1InDeg(trial)*pi/180);
+        tmpstate3=translateOnSphere(tmpstate2(1),tmpstate2(2),tmpstate2(3)+rawdata_sph.turnangInDeg(trial)*pi/180,rawdata_sph.dist2InDeg(trial)*pi/180);
+        tmpstate4=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+rawdata_sph.inboundTurnInDeg(trial)*pi/180,rawdata_sph.inboundDistInDeg(trial)*pi/180);
+        tmpstate5=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+table_triangle.plane_inboundTurnInDeg(shape)*pi/180,table_triangle.plane_inboundDistInDeg(shape)*pi/180);
+
+        drawGeodesic(sph2cartFn(tmpstate1(1),tmpstate1(2)),sph2cartFn(tmpstate2(1),tmpstate2(2)),<span class="string">'b'</span>);
+        drawGeodesic(sph2cartFn(tmpstate2(1),tmpstate2(2)),sph2cartFn(tmpstate3(1),tmpstate3(2)),<span class="string">'b'</span>);
+<span class="comment">%         drawGeodesic(sph2cartFn(tmpstate3(1),tmpstate3(2)),sph2cartFn(tmpstate4(1),tmpstate4(2)),'r');</span>
+        drawGeodesic(sph2cartFn(tmpstate3(1),tmpstate3(2)),sph2cartFn(tmpstate1(1),tmpstate1(2)),<span class="string">'k'</span>);
+
+        <span class="keyword">for</span> n=1:11
+              intermediate=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+rawdata_sph.inboundTurnInDeg(trial)*pi/180,rawdata_sph.inboundDistInDeg(trial)*pi/180*(n-1)/10);
+              intermediate_cart(n,:)=sph2cartFn(intermediate(1),intermediate(2));
+         <span class="keyword">end</span>
+        plot3(intermediate_cart(:,1),intermediate_cart(:,2),intermediate_cart(:,3),<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,2);
+</pre><img vspace="5" hspace="5" src="create3DwebpageTriangle_02.png" alt=""> <img vspace="5" hspace="5" src="create3DwebpageTriangle_03.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% create interactive webpage of 3D trajectories
+% for presentation purpose
+% 2021.12.30 MK
+close all;
+clear;
+clc;
+
+[basesph_x,basesph_y,basesph_z]=sphere(20); %prepare a base sphere
+
+%% Load behaviour data txt files
+rootdir='../behData';
+subId_list={'psub00','psub01','psub02','psub03','psub04','psub05'};% change in triangle shape from previous subject
+
+rawdata_sph=[];
+rawdata_plane=[];
+for sub=1:length(subId_list)
+    subId=subId_list{sub};
+    behdir=[rootdir,filesep,subId,filesep,'sphere'];
+    fn=dir(sprintf('%s/*triangleTestSum*',behdir));
+    for run=1:length(fn)
+        tmpdata=readtable([behdir,filesep,fn(run).name],'filetype','text');
+        tmpdata.sub=sub*ones(size(tmpdata,1),1);
+        tmpdata.run=run*ones(size(tmpdata,1),1);
+        rawdata_sph=[rawdata_sph;tmpdata];
+    end
+    behdir=[rootdir,filesep,subId,filesep,'plane'];
+    fn=dir(sprintf('%s/*trianglePlaneTestSum*',behdir));
+    for run=1:length(fn)
+        tmpdata=readtable([behdir,filesep,fn(run).name],'filetype','text');
+        tmpdata.sub=sub*ones(size(tmpdata,1),1);
+        tmpdata.run=run*ones(size(tmpdata,1),1);
+        rawdata_plane=[rawdata_plane;tmpdata];
+    end
+end
+%% preprocessing inbound turn angle so that it ranges between [-180,180]
+% inbound turn angle saved from Unity is between -360 to 360deg, to make it easier to analyse, I calculated the angle as
+% between -180 and 180deg
+rawdata_sph.inboundTurnInDeg(rawdata_sph.inboundTurnInDeg>180)=rawdata_sph.inboundTurnInDeg(rawdata_sph.inboundTurnInDeg>180)-360;
+rawdata_sph.inboundTurnInDeg(rawdata_sph.inboundTurnInDeg<-180)=rawdata_sph.inboundTurnInDeg(rawdata_sph.inboundTurnInDeg<-180)+360;
+rawdata_plane.inboundTurnInDeg(rawdata_plane.inboundTurnInDeg>180)=rawdata_plane.inboundTurnInDeg(rawdata_plane.inboundTurnInDeg>180)-360;
+rawdata_plane.inboundTurnInDeg(rawdata_plane.inboundTurnInDeg<-180)=rawdata_plane.inboundTurnInDeg(rawdata_plane.inboundTurnInDeg<-180)+360;
+
+% also calculate the absolute distance error from the origin
+rawdata_plane.absErrorInDeg=sqrt((rawdata_plane.returned_XInDeg).^2+(rawdata_plane.returned_YInDeg).^2);
+
+returned_cart=sph2cartMKunity(rawdata_sph.returned_aziInDeg,rawdata_sph.returned_pitInDeg);
+start_cart=sph2cartMKunity(rawdata_sph.pos1_aziInDeg,rawdata_sph.pos1_pitInDeg);
+for i=1:length(returned_cart)
+    arclen(i,1)=acosd(dot(returned_cart(i,:),start_cart(i,:)));
+end
+rawdata_sph.absErrorInDeg=arclen;
+%% preprocess inbound distance because of a rare case where a wrong distance was logeged
+% normally, saved end position (returned_aziInDeg,returned_pitInDeg) should match with the estimated end position by adding 3 legs (using dist1InDeg,dist2InDeg, turnangInDeg, inboundDistInDeg, inboundTurnInDeg)
+% however,in the early version of Unity script (psub00-psub05), I computed the inboundDistInDeg by geodesic distance between the two locations so when a participant move >180deg, the distance is saved as 360-X (e.g. dist of 240deg becomes 120deg)
+% which caused a large discrepancy between the end position and reconstructed position
+% I can fix the inboundDistInDistance for such cases
+distBtwDeadreckonActual=zeros(size(rawdata_sph,1),1);%discrepancy between the saved end position, and the position calculated by adding up 3 legs
+for trial=1:size(rawdata_sph,1)
+    tmpstate1=[0,0,0]; %azi,pit,theta in radian for starting position
+    tmpstate2=translateOnSphere(0,0,0,rawdata_sph.dist1InDeg(trial)*pi/180); % end of first leg
+    tmpstate3=translateOnSphere(tmpstate2(1),tmpstate2(2),tmpstate2(3)+rawdata_sph.turnangInDeg(trial)*pi/180,rawdata_sph.dist2InDeg(trial)*pi/180); % end of second leg
+    tmpstate4=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+rawdata_sph.inboundTurnInDeg(trial)*pi/180,rawdata_sph.inboundDistInDeg(trial)*pi/180); % end of inbound leg
+
+    response_cart=sph2cartFn(tmpstate4(1),tmpstate4(2));
+    distBtwDeadreckonActual(trial,1)=acosd(dot(response_cart,sph2cartMKunity(rawdata_sph.returned_aziInDeg(trial),rawdata_sph.returned_pitInDeg(trial))));
+end
+over180degTrial=distBtwDeadreckonActual>50; 
+rawdata_sph.inboundDistInDeg(over180degTrial)=360-rawdata_sph.inboundDistInDeg(over180degTrial);
+%% sort the trials by same shape and collapse left/right symmetry
+% first find unique triangle shape
+triangleShape=unique([rawdata_sph.dist1InDeg,rawdata_sph.dist2InDeg,rawdata_sph.turnangInDeg],'rows');
+triangleShape=sortrows(triangleShape,3,'descend');
+
+
+% triangleShape(1,:)=[67.5,135,120];%dist1, dist2, turnang
+% triangleShape(2,:)=[45,135,90];%dist1, dist2, ang3
+% triangleShape(3,:)=[90,45,60];%on plan,e return angle=90deg large, dist is small, so I like to keep it to have a wide range of ideal planar homing vector (however, it is relatively small triangle, so sphere/plane dissociation is difficult)
+% triangleShape(4,:)=[135,67.5,60];%dist1, dist2, ang3
+% triangleShape(5,:)=[135,45,120];%dist1, dist2, ang3
+% triangleShape(6,:)=[135,90,90];%large triangle that can distinguish sph/plane, as well as good turning range for plane.
+% triangleShape(7,:)=[67.5,135,-120];%dist1, dist2, turnang
+% triangleShape(8,:)=[45,135,-90];%dist1, dist2, ang3
+% triangleShape(9,:)=[90,45,-60];%on plan,e return angle=90deg large, dist is small, so I like to keep it to have a wide range of ideal planar homing vector (however, it is relatively small triangle, so sphere/plane dissociation is difficult)
+% triangleShape(10,:)=[135,67.5,-60];%dist1, dist2, ang3
+% triangleShape(11,:)=[135,45,-120];%dist1, dist2, ang3
+% triangleShape(12,:)=[135,90,-90];%large triangle that can distinguish sph/plane, as well as good turning range for plane.
+
+% collapse left/right symmetric shape?
+trial_leftturn=(rawdata_sph.turnangInDeg<0);
+rawdata_sph.pos3_aziInDeg(trial_leftturn)=-rawdata_sph.pos3_aziInDeg(trial_leftturn);
+rawdata_sph.returned_aziInDeg(trial_leftturn)=-rawdata_sph.returned_aziInDeg(trial_leftturn);
+rawdata_sph.inboundTurnInDeg(trial_leftturn)=-rawdata_sph.inboundTurnInDeg(trial_leftturn);
+rawdata_sph.turnangInDeg(trial_leftturn)=-rawdata_sph.turnangInDeg(trial_leftturn);
+
+
+trial_leftturn=(rawdata_plane.turnangInDeg<0);
+rawdata_plane.pos3_XInDeg(trial_leftturn)=-rawdata_plane.pos3_XInDeg(trial_leftturn);
+rawdata_plane.returned_XInDeg(trial_leftturn)=-rawdata_plane.returned_XInDeg(trial_leftturn);
+rawdata_plane.inboundTurnInDeg(trial_leftturn)=-rawdata_plane.inboundTurnInDeg(trial_leftturn);
+rawdata_plane.turnangInDeg(trial_leftturn)=-rawdata_plane.turnangInDeg(trial_leftturn);
+
+[~,shapeIdx_sph]=ismember([rawdata_sph.dist1InDeg,rawdata_sph.dist2InDeg,rawdata_sph.turnangInDeg],triangleShape,'rows');
+[~,shapeIdx_plane]=ismember([rawdata_plane.dist1InDeg,rawdata_plane.dist2InDeg,rawdata_plane.turnangInDeg],triangleShape,'rows');
+
+%% calculate the ideal turn angle and distance
+leg1InDeg=[];leg2InDeg=[];turnInDeg=[];sph_inboundDistInDeg=[];sph_inboundTurnInDeg=[];plane_inboundDistInDeg=[];plane_inboundTurnInDeg=[];
+for i=1:size(triangleShape,1);
+    dist1=deg2rad(triangleShape(i,1));
+    dist2=deg2rad(triangleShape(i,2));
+    ang3=deg2rad(180-triangleShape(i,3));
+    % 1)spherical case: sin(b)sin(c)cos(A)=cos(a)-cos(c)cos(b) // cosine rule for side
+    dist3_sph=acos(sin(dist1)*sin(dist2)*cos(ang3)+cos(dist1)*cos(dist2)); %arclength of inbound leg using the cosine rule
+    ang1_sph=acos((cos(dist1)-cos(dist2)*cos(dist3_sph))/sin(dist2)/sin(dist3_sph));
+    ang2_sph=acos((cos(dist2)-cos(dist1)*cos(dist3_sph))/sin(dist1)/sin(dist3_sph));
+    %inboundturn_sph=pi-ang1_sph;
+    
+    % 2)planar case: c^2=a^2+b^2-2*a*b*cos(C);
+    dist3_plane=sqrt(dist1^2+dist2^2-2*dist1*dist2*cos(ang3));
+    ang1_plane=acos((dist2^2+dist3_plane^2-dist1^2)/2/dist2/dist3_plane);
+    ang2_plane=pi-ang1_plane-ang3;
+    %inboundturn_plane=pi_ang1;
+    
+    leg1InDeg(i,1)=triangleShape(i,1);
+    leg2InDeg(i,1)=triangleShape(i,2);
+    turnInDeg(i,1)=triangleShape(i,3);
+   
+    sph_inboundDistInDeg(i,1)=rad2deg(dist3_sph);
+    sph_inboundTurnInDeg(i,1)=rad2deg(pi-ang1_sph);
+    plane_inboundDistInDeg(i,1)=rad2deg(dist3_plane);
+    plane_inboundTurnInDeg(i,1)=rad2deg(pi-ang1_plane);
+end
+table_triangle=table(leg1InDeg,leg2InDeg,turnInDeg,sph_inboundDistInDeg,sph_inboundTurnInDeg,plane_inboundDistInDeg,plane_inboundTurnInDeg);
+
+
+%% calculate distance error relative to spherical and planar solution
+% also calculate the absolute distance error from the origin
+rawdata_plane.absErrorInDeg=sqrt((rawdata_plane.returned_XInDeg).^2+(rawdata_plane.returned_YInDeg).^2);
+
+returned_cart=sph2cartMKunity(rawdata_sph.returned_aziInDeg,rawdata_sph.returned_pitInDeg);
+start_cart=sph2cartMKunity(rawdata_sph.pos1_aziInDeg,rawdata_sph.pos1_pitInDeg);
+for i=1:length(returned_cart)
+    arclen(i,1)=acosd(dot(returned_cart(i,:),start_cart(i,:)));
+end
+rawdata_sph.absErrorInDeg=arclen;
+for trial=1:size(rawdata_sph,1)
+    shape=shapeIdx_sph(trial);% triangle shape idx for  given trial
+    dist1=rawdata_sph.dist1InDeg(trial);dist2=rawdata_sph.dist2InDeg(trial);dist3=rawdata_sph.inboundDistInDeg(trial);
+    theta1=90;theta2=theta1-rawdata_sph.turnangInDeg(trial); theta3=theta2-rawdata_sph.inboundTurnInDeg(trial);
+    plane_pos(1,:)=[0,0];
+    plane_pos(2,:)=plane_pos(1,:)+dist1*[cosd(theta1),sind(theta1)];
+    plane_pos(3,:)=plane_pos(2,:)+dist2*[cosd(theta2),sind(theta2)];
+    plane_pos(4,:)=plane_pos(3,:)+dist3*[cosd(theta3),sind(theta3)];
+    
+    theta_sph=theta2-table_triangle.sph_inboundTurnInDeg(shape);
+    plane_pos(5,:)=plane_pos(3,:)+table_triangle.sph_inboundDistInDeg(shape)*[cosd(theta_sph),sind(theta_sph)];
+    
+    lenRelPlaneSol(trial,1)=sqrt(sum((plane_pos(4,:)-plane_pos(1,:)).^2));
+    lenRelSphSol(trial,1)=sqrt(sum((plane_pos(4,:)-plane_pos(5,:)).^2));
+    
+    tmpstate1=[0,0,0];
+    tmpstate2=translateOnSphere(0,0,0,rawdata_sph.dist1InDeg(trial)*pi/180);
+    tmpstate3=translateOnSphere(tmpstate2(1),tmpstate2(2),tmpstate2(3)+rawdata_sph.turnangInDeg(trial)*pi/180,rawdata_sph.dist2InDeg(trial)*pi/180);
+    tmpstate4=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+rawdata_sph.inboundTurnInDeg(trial)*pi/180,rawdata_sph.inboundDistInDeg(trial)*pi/180);
+    tmpstate5=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+table_triangle.plane_inboundTurnInDeg(shape)*pi/180,table_triangle.plane_inboundDistInDeg(shape)*pi/180);
+    response_cart=sph2cartFn(tmpstate4(1),tmpstate4(2));
+    planeSol_cart=sph2cartFn(tmpstate5(1),tmpstate5(2));
+    
+    sphSol_cart=sph2cartFn(tmpstate1(1),tmpstate1(2));
+    arclenRelPlaneSol(trial,1)=acosd(dot(response_cart,planeSol_cart));
+    arclenRelSphSol(trial,1)=acosd(dot(response_cart,sphSol_cart));
+    
+end
+rawdata_sph.arclenRelSphSol=arclenRelSphSol;
+rawdata_sph.arclenRelPlaneSol=arclenRelPlaneSol;
+rawdata_plane.lenRelSphSol=lenRelSphSol;
+rawdata_plane.lenRelPlaneSol=lenRelPlaneSol;
+
+option=[];option.plotdot=1;option.ticklabels={'sphSol','planeSol'};
+figure;
+subplot(1,2,1);ttestplotMK2([rawdata_sph.arclenRelSphSol,rawdata_sph.arclenRelPlaneSol],option); ylabel('deviation on sphere');
+subplot(1,2,2);ttestplotMK2([rawdata_plane.lenRelSphSol,rawdata_plane.lenRelPlaneSol],option); ylabel('deviation on plane');
+
+
+%% to be deleted (something is wrong with this participant. saved azi,pit of the returned is completely different from coordinates reconstructed from turn angle and distance 
+figure;
+
+
+h0=mesh(basesph_x,basesph_y,basesph_z,'FaceAlpha',0.5,'Edgecolor','k');hold on;
+               xlabel('x');ylabel('y');
+       tmpstate1=[0,0,0];
+        tmpstate2=translateOnSphere(0,0,0,rawdata_sph.dist1InDeg(trial)*pi/180);
+        tmpstate3=translateOnSphere(tmpstate2(1),tmpstate2(2),tmpstate2(3)+rawdata_sph.turnangInDeg(trial)*pi/180,rawdata_sph.dist2InDeg(trial)*pi/180);
+        tmpstate4=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+rawdata_sph.inboundTurnInDeg(trial)*pi/180,rawdata_sph.inboundDistInDeg(trial)*pi/180);
+        tmpstate5=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+table_triangle.plane_inboundTurnInDeg(shape)*pi/180,table_triangle.plane_inboundDistInDeg(shape)*pi/180);
+        
+        drawGeodesic(sph2cartFn(tmpstate1(1),tmpstate1(2)),sph2cartFn(tmpstate2(1),tmpstate2(2)),'b');
+        drawGeodesic(sph2cartFn(tmpstate2(1),tmpstate2(2)),sph2cartFn(tmpstate3(1),tmpstate3(2)),'b');
+%         drawGeodesic(sph2cartFn(tmpstate3(1),tmpstate3(2)),sph2cartFn(tmpstate4(1),tmpstate4(2)),'r');
+        drawGeodesic(sph2cartFn(tmpstate3(1),tmpstate3(2)),sph2cartFn(tmpstate1(1),tmpstate1(2)),'k');
+       
+        for n=1:11
+              intermediate=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+rawdata_sph.inboundTurnInDeg(trial)*pi/180,rawdata_sph.inboundDistInDeg(trial)*pi/180*(n-1)/10);
+              intermediate_cart(n,:)=sph2cartFn(intermediate(1),intermediate(2));
+         end
+        plot3(intermediate_cart(:,1),intermediate_cart(:,2),intermediate_cart(:,3),'r','LineWidth',2);
+        
+
+##### SOURCE END #####
+--></body></html>
