@@ -1,0 +1,475 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>analysisScript4Angelika</title><meta name="generator" content="MATLAB 9.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-05-18"><meta name="DC.source" content="analysisScript4Angelika.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">for discussion with Angelika Stefan</a></li><li><a href="#2">load the curated data</a></li><li><a href="#3">[visiual inspection of the data] display all trajectories on the sphere</a></li><li><a href="#4">display raw turn angle and ideal turn angle for each model within the same plot (all trials)</a></li><li><a href="#5">display the linear regression result separately for the plane and sphere geometry model (all trials)</a></li><li><a href="#6">display the linear regression result separately for the plane and sphere geometry model (individual participants) and compare R square at the group level</a></li><li><a href="#7">linear mixed model including all data, instead of separately looking individual data</a></li></ul></div><h2 id="1">for discussion with Angelika Stefan</h2><p>triangle completion task data visualisation and analysis 1) this script shows the actual data, ideal plane geometry prediction, ideal sphere geometry prediction 2) run the linear regression within participants and compare Rsquare for the Plane model and Sphere model at the group level 3) linear mixed model using all participants data in the same model then compare BIC between the Plane and Sphere model</p><pre class="codeinput"><span class="comment">% 2022.05.18 MK</span>
+clear <span class="string">all</span>;close <span class="string">all</span>;clc;
+
+[basesph_x,basesph_y,basesph_z]=sphere(20); <span class="comment">%prepare a base sphere for display</span>
+</pre><h2 id="2">load the curated data</h2><pre class="codeinput">cleanData_combine=readtable(<span class="string">'data_4Angelika.csv'</span>);
+cleanData_combine=cleanData_combine(~ismember(cleanData_combine.env,<span class="string">'plane'</span>),:); <span class="comment">% let's remove the control condition for now.</span>
+</pre><h2 id="3">[visiual inspection of the data] display all trajectories on the sphere</h2><p>display the raw data on the sphere (3 selected triangle out of 7)</p><pre class="codeinput">viewangleForTriangle(1,:)=[-180,-40];
+viewangleForTriangle(2,:)=[-180,-40];
+viewangleForTriangle(3,:)=[-115,-17];
+viewangleForTriangle(4,:)=[-115,-17];
+viewangleForTriangle(5,:)=[-150,-27];
+viewangleForTriangle(6,:)=[-115,-17]; <span class="comment">% good view angle for this particular triangle shape on the sphere</span>
+<span class="keyword">for</span> shape=[2,5,6]<span class="comment">%1:nUniqueShape</span>
+    subtrial=find(cleanData_combine.shapeIdx==shape);
+<span class="comment">%     subplot(1,nUniqueShape,shape);</span>
+    figure(<span class="string">'Color'</span>,<span class="string">'w'</span>,<span class="string">'Name'</span>,sprintf(<span class="string">'Sph shape%d'</span>,shape));
+    h0=mesh(basesph_x,basesph_y,basesph_z,<span class="string">'FaceAlpha'</span>,1,<span class="string">'EdgeColor'</span>,[.6,.6,.6]);hold <span class="string">on</span>;
+    view(viewangleForTriangle(shape,1),viewangleForTriangle(shape,2));
+    xlabel(<span class="string">'x'</span>);ylabel(<span class="string">'y'</span>);zlabel(<span class="string">'z'</span>);
+    axis <span class="string">equal</span>;xlim([-1 1]);ylim([-1 1]);zlim([-1 1]);
+    axis <span class="string">off</span>;
+
+    <span class="comment">% first show the triangle shape</span>
+    trial=subtrial(1);
+    tmpstate1=[0,pi,0];<span class="comment">% start of the first leg = ideal return location for sphere geometry</span>
+    tmpstate2=translateOnSphere(tmpstate1(1),tmpstate1(2),tmpstate1(3),cleanData_combine.dist1InDeg(trial)*pi/180); <span class="comment">% start of the second leg</span>
+    tmpstate3=translateOnSphere(tmpstate2(1),tmpstate2(2),tmpstate2(3)+cleanData_combine.turnangInDeg(trial)*pi/180,cleanData_combine.dist2InDeg(trial)*pi/180); <span class="comment">% start of the third leg</span>
+    tmpstate4=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+cleanData_combine.idealPlane_inboundTurn(trial)*pi/180,cleanData_combine.idealPlane_inboundDist(trial)*pi/180); <span class="comment">% ideal return location for planar geometry</span>
+
+    drawGeodesic(sph2cartFn(tmpstate1(1),tmpstate1(2)),sph2cartFn(tmpstate2(1),tmpstate2(2)),<span class="string">'r'</span>,1.5); <span class="comment">% first leg</span>
+    drawGeodesic(sph2cartFn(tmpstate2(1),tmpstate2(2)),sph2cartFn(tmpstate3(1),tmpstate3(2)),<span class="string">'r'</span>,1.5); <span class="comment">% second leg</span>
+    drawGeodesic(sph2cartFn(tmpstate3(1),tmpstate3(2)),sph2cartFn(tmpstate1(1),tmpstate1(2)),<span class="string">'b'</span>,1.5); <span class="comment">% ideal return (sph geometry)</span>
+    drawGeodesic(sph2cartFn(tmpstate3(1),tmpstate3(2)),sph2cartFn(tmpstate4(1),tmpstate4(2)),[.5,.7,.2],1.5); <span class="comment">% ideal return (plane geometry)</span>
+
+    <span class="comment">% then display individual trial data</span>
+    stepSize=5;<span class="comment">% plot dot every 5 degree, if the step size is larger then the line looks more discrete</span>
+    <span class="keyword">for</span> trial=subtrial'
+        stepN=round(cleanData_combine.inboundDistInDeg(trial)/stepSize);
+        intermediate_cart=[];
+        <span class="keyword">for</span> n=1:stepN
+            intermediate=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+cleanData_combine.inboundTurnInDeg(trial)*pi/180,cleanData_combine.inboundDistInDeg(trial)*pi/180*(n-1)/(stepN-1));
+            intermediate_cart(n,:)=sph2cartFn(intermediate(1),intermediate(2));
+        <span class="keyword">end</span>
+        plot3(intermediate_cart(:,1),intermediate_cart(:,2),intermediate_cart(:,3),<span class="string">'Color'</span>,[0,0,0],<span class="string">'LineWidth'</span>,0.25);
+    <span class="keyword">end</span>
+
+    isPlotMean=1;
+    <span class="keyword">if</span> (isPlotMean) <span class="comment">%mean respones of all trial for given triangle shape</span>
+        tmpDist=mean(cleanData_combine.inboundDistInDeg(subtrial));
+        tmpTurn=mean(cleanData_combine.inboundTurnInDeg(subtrial));
+        stepN=round(cleanData_combine.inboundDistInDeg(trial)/stepSize);
+        intermediate_cart=[];
+        <span class="keyword">for</span> n=1:stepN
+            intermediate=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+tmpTurn*pi/180,tmpDist*pi/180*(n-1)/(stepN-1));
+            intermediate_cart(n,:)=sph2cartFn(intermediate(1),intermediate(2));
+        <span class="keyword">end</span>
+        plot3(intermediate_cart(:,1),intermediate_cart(:,2),intermediate_cart(:,3),<span class="string">'k'</span>,<span class="string">'LineWidth'</span>,1.5);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="analysisScript4Angelika_01.png" alt=""> <img vspace="5" hspace="5" src="analysisScript4Angelika_02.png" alt=""> <img vspace="5" hspace="5" src="analysisScript4Angelika_03.png" alt=""> <h2 id="4">display raw turn angle and ideal turn angle for each model within the same plot (all trials)</h2><pre class="codeinput">[~,unqIdx]=unique(cleanData_combine.shapeIdx);
+table_triangle=cleanData_combine(unqIdx,[<span class="string">"shapeIdx"</span>,<span class="string">"dist1InDeg"</span>,<span class="string">"dist2InDeg"</span>,<span class="string">"turnangInDeg"</span>,<span class="string">"idealPlane_inboundDist"</span>,<span class="string">"idealPlane_inboundTurn"</span>,<span class="string">"idealSph_inboundDist"</span>,<span class="string">"idealSph_inboundTurn"</span>]);
+
+[~,triangleOrder]=sort(table_triangle.idealPlane_inboundTurn);
+[~,newOrder]=ismember(1:7,triangleOrder);
+figure(<span class="string">'name'</span>,<span class="string">'sorted by plane turn'</span>); hold <span class="string">on</span>;
+tmpShapeIdx=cleanData_combine.shapeIdx;
+h_box=boxplot(cleanData_combine.inboundTurnInDeg,newOrder(tmpShapeIdx));
+h_data=plot(newOrder(tmpShapeIdx),cleanData_combine.inboundTurnInDeg,<span class="string">'k.'</span>); hold <span class="string">on</span>;
+h_plane=plot(1:7,table_triangle.idealPlane_inboundTurn(triangleOrder),<span class="string">'Color'</span>,[.5,.7,.2]);
+h_sph=plot(1:7,table_triangle.idealSph_inboundTurn(triangleOrder),<span class="string">'b'</span>);
+legend(<span class="string">'actual'</span>,<span class="string">'ideal plane'</span>,<span class="string">'ideal sph'</span>);
+ylabel(<span class="string">'inbound turn (deg)'</span>); xlabel(<span class="string">'triangle shape Idx (sorted by plane turn)'</span>)
+</pre><img vspace="5" hspace="5" src="analysisScript4Angelika_04.png" alt=""> <h2 id="5">display the linear regression result separately for the plane and sphere geometry model (all trials)</h2><p>note, this is probably over confident fit because I combine all particpant's data without partioning the within-subject and across-subject variance for now, just simple visualisation purpose (eye balling)</p><pre class="codeinput">mdl1=fitlm(cleanData_combine,<span class="string">'inboundTurnInDeg~1+idealPlane_inboundTurn'</span>)
+mdl2=fitlm(cleanData_combine,<span class="string">'inboundTurnInDeg~1+idealSph_inboundTurn'</span>)
+figure;
+subplot(1,2,1);plot(mdl1);title(sprintf(<span class="string">'plane model:Rsq=%.2f'</span>,mdl1.Rsquared.Ordinary));
+subplot(1,2,2);plot(mdl2);title(sprintf(<span class="string">'sph model:Rsq=%.2f'</span>,mdl2.Rsquared.Ordinary));
+</pre><pre class="codeoutput">
+mdl1 = 
+
+
+Linear regression model:
+    inboundTurnInDeg ~ 1 + idealPlane_inboundTurn
+
+Estimated Coefficients:
+                              Estimate       SE       tStat      pValue  
+                              ________    ________    ______    _________
+
+    (Intercept)                 33.74       5.2265    6.4555     3.76e-10
+    idealPlane_inboundTurn    0.70146     0.041154    17.045    2.035e-47
+
+
+Number of observations: 339, Error degrees of freedom: 337
+Root Mean Squared Error: 25.2
+R-squared: 0.463,  Adjusted R-Squared: 0.461
+F-statistic vs. constant model: 291, p-value = 2.03e-47
+
+mdl2 = 
+
+
+Linear regression model:
+    inboundTurnInDeg ~ 1 + idealSph_inboundTurn
+
+Estimated Coefficients:
+                            Estimate       SE       tStat       pValue  
+                            ________    ________    ______    __________
+
+    (Intercept)              73.238        3.838    19.082    1.4692e-55
+    idealSph_inboundTurn    0.67577     0.051263    13.182    2.7452e-32
+
+
+Number of observations: 339, Error degrees of freedom: 337
+Root Mean Squared Error: 27.9
+R-squared: 0.34,  Adjusted R-Squared: 0.338
+F-statistic vs. constant model: 174, p-value = 2.75e-32
+</pre><img vspace="5" hspace="5" src="analysisScript4Angelika_05.png" alt=""> <h2 id="6">display the linear regression result separately for the plane and sphere geometry model (individual participants) and compare R square at the group level</h2><pre class="codeinput"><span class="keyword">for</span> sub=1:14
+    tmptrial=cleanData_combine.sub==sub;
+    mdl1=fitlm(cleanData_combine(tmptrial,:),<span class="string">'inboundTurnInDeg~1+idealPlane_inboundTurn'</span>);
+    mdl2=fitlm(cleanData_combine(tmptrial,:),<span class="string">'inboundTurnInDeg~1+idealSph_inboundTurn'</span>);
+    saveModel{sub,1}=mdl1;saveModel{sub,2}=mdl2;
+    sumRsq(sub,1)=mdl1.Rsquared.Ordinary;<span class="comment">% R squared for plane geometry model</span>
+    sumRsq(sub,2)=mdl2.Rsquared.Ordinary;<span class="comment">% R squared for sph geometry model</span>
+<span class="keyword">end</span>
+option.plotdot=1; option.ticklabel={<span class="string">'plane'</span>,<span class="string">'sph'</span>};option.showpval=0;
+option.barColor=[0.47,0.67,0.19;0,0.45,0.74];
+
+figure;ttestplotMK2(sumRsq,option);ylabel(<span class="string">'R squared'</span>);
+tmpdata=sumRsq(:,1)-sumRsq(:,2);
+[h,p,~,st]=ttest(tmpdata,0,<span class="string">'tail'</span>,<span class="string">'right'</span>);
+fprintf(<span class="string">'Rsq plane&gt;sph model, one-sided t-test, plane vs. sph, t(%d)=%.1f, p=%.3f, effect size=%.2f \n'</span>,st.df,st.tstat,p,mean(tmpdata)/std(tmpdata));
+<span class="comment">% display a few participant's regression result</span>
+figure;
+selectSub=[5,9,11];
+<span class="keyword">for</span> sub=1:length(selectSub)
+    mdl1=saveModel{selectSub(sub),1}; <span class="comment">%plane model fit for this subject</span>
+    mdl2=saveModel{selectSub(sub),2};<span class="comment">%sph model fit for this subject</span>
+    subplot(3,2,sub*2-1);plot(mdl1);title(sprintf(<span class="string">'plane:Rsq=%.2f'</span>,mdl1.Rsquared.Ordinary));legend <span class="string">off</span>;ylabel(<span class="string">'turn ang'</span>); xlabel(<span class="string">'ideal plane turn'</span>);
+    subplot(3,2,sub*2);plot(mdl2);title(sprintf(<span class="string">'sph:Rsq=%.2f'</span>,mdl2.Rsquared.Ordinary));legend <span class="string">off</span>;ylabel(<span class="string">'turn ang'</span>); xlabel(<span class="string">'ideal sph turn'</span>);
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Rsq plane&gt;sph model, one-sided t-test, plane vs. sph, t(13)=3.4, p=0.002, effect size=0.92 
+</pre><img vspace="5" hspace="5" src="analysisScript4Angelika_06.png" alt=""> <img vspace="5" hspace="5" src="analysisScript4Angelika_07.png" alt=""> <h2 id="7">linear mixed model including all data, instead of separately looking individual data</h2><p>I will check how BIC changes as I include more subject's data into the model, from 5 subjects to entire 14 subjects</p><pre class="codeinput"><span class="keyword">for</span> nSub=5:14;
+    cleandata_sph=cleanData_combine(cleanData_combine.sub&lt;=nSub,:);
+    lme_sphData_turn_planeM=fitlme(cleandata_sph,<span class="string">'inboundTurnInDeg~1+idealPlane_inboundTurn+(1+idealPlane_inboundTurn|sub)'</span>);
+    lme_sphData_turn_sphM=fitlme(cleandata_sph,<span class="string">'inboundTurnInDeg~1+idealSph_inboundTurn+(1+idealSph_inboundTurn|sub)'</span>);
+
+    BIC_sphData_turn_planeM=lme_sphData_turn_planeM.ModelCriterion.BIC;
+    BIC_sphData_turn_sphM=lme_sphData_turn_sphM.ModelCriterion.BIC;
+    BICdiff=BIC_sphData_turn_sphM-BIC_sphData_turn_planeM;
+    BF_approx=exp(BICdiff/2);
+    fprintf(<span class="string">'n=%d, BIC diff=%.1f, BF_approx=%.1E\n'</span>,nSub,BICdiff,BF_approx);
+
+    saveLME{nSub,1}=lme_sphData_turn_planeM;
+    saveLME{nSub,2}=lme_sphData_turn_sphM;
+
+<span class="keyword">end</span>
+<span class="comment">% let's display the LME result when all 14 dataset were included</span>
+display(lme_sphData_turn_planeM);
+display(lme_sphData_turn_sphM);
+</pre><pre class="codeoutput">n=5, BIC diff=41.1, BF_approx=8.4E+08
+n=6, BIC diff=35.4, BF_approx=4.8E+07
+n=7, BIC diff=40.3, BF_approx=5.7E+08
+n=8, BIC diff=51.0, BF_approx=1.2E+11
+n=9, BIC diff=58.5, BF_approx=5.1E+12
+n=10, BIC diff=57.1, BF_approx=2.5E+12
+n=11, BIC diff=57.4, BF_approx=3.0E+12
+n=12, BIC diff=63.3, BF_approx=5.7E+13
+n=13, BIC diff=75.5, BF_approx=2.5E+16
+n=14, BIC diff=88.0, BF_approx=1.3E+19
+
+lme_sphData_turn_planeM = 
+
+
+Linear mixed-effects model fit by ML
+
+Model information:
+    Number of observations             339
+    Fixed effects coefficients           2
+    Random effects coefficients         28
+    Covariance parameters                4
+
+Formula:
+    Linear Mixed Formula with 2 predictors.
+
+Model fit statistics:
+    AIC       BIC       LogLikelihood    Deviance
+    3032.6    3055.5    -1510.3          3020.6  
+
+Fixed effects coefficients (95% CIs):
+    Name                              Estimate    SE          tStat     DF 
+    {'(Intercept)'           }         41.152       10.398    3.9578    337
+    {'idealPlane_inboundTurn'}        0.64728     0.061904    10.456    337
+
+
+    pValue        Lower      Upper  
+    9.2271e-05     20.699     61.604
+    2.3859e-22    0.52552    0.76905
+
+Random effects covariance parameters (95% CIs):
+Group: sub (14 Levels)
+    Name1                             Name2                         
+    {'(Intercept)'           }        {'(Intercept)'           }    
+    {'idealPlane_inboundTurn'}        {'(Intercept)'           }    
+    {'idealPlane_inboundTurn'}        {'idealPlane_inboundTurn'}    
+
+
+    Type            Estimate    Lower       Upper   
+    {'std' }          35.424      22.442      55.914
+    {'corr'}        -0.94731    -0.98725    -0.79516
+    {'std' }         0.19461     0.11183     0.33866
+
+Group: Error
+    Name               Estimate    Lower     Upper 
+    {'Res Std'}        19.312      17.848    20.897
+
+
+lme_sphData_turn_sphM = 
+
+
+Linear mixed-effects model fit by ML
+
+Model information:
+    Number of observations             339
+    Fixed effects coefficients           2
+    Random effects coefficients         28
+    Covariance parameters                4
+
+Formula:
+    Linear Mixed Formula with 2 predictors.
+
+Model fit statistics:
+    AIC       BIC       LogLikelihood    Deviance
+    3120.6    3143.5    -1554.3          3108.6  
+
+Fixed effects coefficients (95% CIs):
+    Name                            Estimate    SE          tStat    DF 
+    {'(Intercept)'         }         78.192       8.2005    9.535    337
+    {'idealSph_inboundTurn'}        0.61942     0.068482    9.045    337
+
+
+    pValue        Lower      Upper  
+    3.0984e-19     62.062     94.323
+    1.2096e-17    0.48471    0.75412
+
+Random effects covariance parameters (95% CIs):
+Group: sub (14 Levels)
+    Name1                           Name2                           Type        
+    {'(Intercept)'         }        {'(Intercept)'         }        {'std' }    
+    {'idealSph_inboundTurn'}        {'(Intercept)'         }        {'corr'}    
+    {'idealSph_inboundTurn'}        {'idealSph_inboundTurn'}        {'std' }    
+
+
+    Estimate    Lower       Upper  
+      28.338      18.432     43.569
+    -0.97191    -0.99899    -0.4279
+     0.20304     0.11245    0.36661
+
+Group: Error
+    Name               Estimate    Lower     Upper
+    {'Res Std'}        22.356      20.661    24.19
+
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2021b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% for discussion with Angelika Stefan
+% triangle completion task data visualisation and analysis
+% 1) this script shows the actual data, ideal plane geometry prediction, ideal
+% sphere geometry prediction
+% 2) run the linear regression within participants and compare Rsquare for the Plane model and Sphere model at
+% the group level 
+% 3) linear mixed model using all participants data in the same model then
+% compare BIC between the Plane and Sphere model
+
+% 2022.05.18 MK
+clear all;close all;clc;
+
+[basesph_x,basesph_y,basesph_z]=sphere(20); %prepare a base sphere for display
+%% load the curated data
+cleanData_combine=readtable('data_4Angelika.csv');
+cleanData_combine=cleanData_combine(~ismember(cleanData_combine.env,'plane'),:); % let's remove the control condition for now.
+%% [visiual inspection of the data] display all trajectories on the sphere
+% display the raw data on the sphere (3 selected triangle out of 7)
+viewangleForTriangle(1,:)=[-180,-40];
+viewangleForTriangle(2,:)=[-180,-40];
+viewangleForTriangle(3,:)=[-115,-17];
+viewangleForTriangle(4,:)=[-115,-17];
+viewangleForTriangle(5,:)=[-150,-27];
+viewangleForTriangle(6,:)=[-115,-17]; % good view angle for this particular triangle shape on the sphere
+for shape=[2,5,6]%1:nUniqueShape
+    subtrial=find(cleanData_combine.shapeIdx==shape);
+%     subplot(1,nUniqueShape,shape);
+    figure('Color','w','Name',sprintf('Sph shape%d',shape));
+    h0=mesh(basesph_x,basesph_y,basesph_z,'FaceAlpha',1,'EdgeColor',[.6,.6,.6]);hold on;
+    view(viewangleForTriangle(shape,1),viewangleForTriangle(shape,2));
+    xlabel('x');ylabel('y');zlabel('z');
+    axis equal;xlim([-1 1]);ylim([-1 1]);zlim([-1 1]);
+    axis off;
+
+    % first show the triangle shape
+    trial=subtrial(1);
+    tmpstate1=[0,pi,0];% start of the first leg = ideal return location for sphere geometry
+    tmpstate2=translateOnSphere(tmpstate1(1),tmpstate1(2),tmpstate1(3),cleanData_combine.dist1InDeg(trial)*pi/180); % start of the second leg
+    tmpstate3=translateOnSphere(tmpstate2(1),tmpstate2(2),tmpstate2(3)+cleanData_combine.turnangInDeg(trial)*pi/180,cleanData_combine.dist2InDeg(trial)*pi/180); % start of the third leg
+    tmpstate4=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+cleanData_combine.idealPlane_inboundTurn(trial)*pi/180,cleanData_combine.idealPlane_inboundDist(trial)*pi/180); % ideal return location for planar geometry
+    
+    drawGeodesic(sph2cartFn(tmpstate1(1),tmpstate1(2)),sph2cartFn(tmpstate2(1),tmpstate2(2)),'r',1.5); % first leg
+    drawGeodesic(sph2cartFn(tmpstate2(1),tmpstate2(2)),sph2cartFn(tmpstate3(1),tmpstate3(2)),'r',1.5); % second leg
+    drawGeodesic(sph2cartFn(tmpstate3(1),tmpstate3(2)),sph2cartFn(tmpstate1(1),tmpstate1(2)),'b',1.5); % ideal return (sph geometry)
+    drawGeodesic(sph2cartFn(tmpstate3(1),tmpstate3(2)),sph2cartFn(tmpstate4(1),tmpstate4(2)),[.5,.7,.2],1.5); % ideal return (plane geometry)
+    
+    % then display individual trial data
+    stepSize=5;% plot dot every 5 degree, if the step size is larger then the line looks more discrete
+    for trial=subtrial'
+        stepN=round(cleanData_combine.inboundDistInDeg(trial)/stepSize); 
+        intermediate_cart=[];
+        for n=1:stepN
+            intermediate=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+cleanData_combine.inboundTurnInDeg(trial)*pi/180,cleanData_combine.inboundDistInDeg(trial)*pi/180*(n-1)/(stepN-1));
+            intermediate_cart(n,:)=sph2cartFn(intermediate(1),intermediate(2));
+        end
+        plot3(intermediate_cart(:,1),intermediate_cart(:,2),intermediate_cart(:,3),'Color',[0,0,0],'LineWidth',0.25);        
+    end
+           
+    isPlotMean=1;
+    if (isPlotMean) %mean respones of all trial for given triangle shape
+        tmpDist=mean(cleanData_combine.inboundDistInDeg(subtrial));
+        tmpTurn=mean(cleanData_combine.inboundTurnInDeg(subtrial));
+        stepN=round(cleanData_combine.inboundDistInDeg(trial)/stepSize); 
+        intermediate_cart=[];
+        for n=1:stepN
+            intermediate=translateOnSphere(tmpstate3(1),tmpstate3(2),tmpstate3(3)+tmpTurn*pi/180,tmpDist*pi/180*(n-1)/(stepN-1));
+            intermediate_cart(n,:)=sph2cartFn(intermediate(1),intermediate(2));
+        end
+        plot3(intermediate_cart(:,1),intermediate_cart(:,2),intermediate_cart(:,3),'k','LineWidth',1.5);
+    end       
+end
+%% display raw turn angle and ideal turn angle for each model within the same plot (all trials)
+[~,unqIdx]=unique(cleanData_combine.shapeIdx);
+table_triangle=cleanData_combine(unqIdx,["shapeIdx","dist1InDeg","dist2InDeg","turnangInDeg","idealPlane_inboundDist","idealPlane_inboundTurn","idealSph_inboundDist","idealSph_inboundTurn"]);
+
+[~,triangleOrder]=sort(table_triangle.idealPlane_inboundTurn);
+[~,newOrder]=ismember(1:7,triangleOrder);
+figure('name','sorted by plane turn'); hold on;
+tmpShapeIdx=cleanData_combine.shapeIdx;
+h_box=boxplot(cleanData_combine.inboundTurnInDeg,newOrder(tmpShapeIdx));
+h_data=plot(newOrder(tmpShapeIdx),cleanData_combine.inboundTurnInDeg,'k.'); hold on;
+h_plane=plot(1:7,table_triangle.idealPlane_inboundTurn(triangleOrder),'Color',[.5,.7,.2]);
+h_sph=plot(1:7,table_triangle.idealSph_inboundTurn(triangleOrder),'b');
+legend('actual','ideal plane','ideal sph');
+ylabel('inbound turn (deg)'); xlabel('triangle shape Idx (sorted by plane turn)')
+
+%% display the linear regression result separately for the plane and sphere geometry model (all trials)
+% note, this is probably over confident fit because I combine all particpant's data without partioning the within-subject and across-subject variance 
+% for now, just simple visualisation purpose (eye balling)
+
+mdl1=fitlm(cleanData_combine,'inboundTurnInDeg~1+idealPlane_inboundTurn')
+mdl2=fitlm(cleanData_combine,'inboundTurnInDeg~1+idealSph_inboundTurn')
+figure;
+subplot(1,2,1);plot(mdl1);title(sprintf('plane model:Rsq=%.2f',mdl1.Rsquared.Ordinary));
+subplot(1,2,2);plot(mdl2);title(sprintf('sph model:Rsq=%.2f',mdl2.Rsquared.Ordinary));
+%% display the linear regression result separately for the plane and sphere geometry model (individual participants) and compare R square at the group level
+for sub=1:14
+    tmptrial=cleanData_combine.sub==sub;
+    mdl1=fitlm(cleanData_combine(tmptrial,:),'inboundTurnInDeg~1+idealPlane_inboundTurn');
+    mdl2=fitlm(cleanData_combine(tmptrial,:),'inboundTurnInDeg~1+idealSph_inboundTurn');
+    saveModel{sub,1}=mdl1;saveModel{sub,2}=mdl2;
+    sumRsq(sub,1)=mdl1.Rsquared.Ordinary;% R squared for plane geometry model
+    sumRsq(sub,2)=mdl2.Rsquared.Ordinary;% R squared for sph geometry model
+end
+option.plotdot=1; option.ticklabel={'plane','sph'};option.showpval=0;
+option.barColor=[0.47,0.67,0.19;0,0.45,0.74];
+
+figure;ttestplotMK2(sumRsq,option);ylabel('R squared');
+tmpdata=sumRsq(:,1)-sumRsq(:,2);
+[h,p,~,st]=ttest(tmpdata,0,'tail','right');
+fprintf('Rsq plane>sph model, one-sided t-test, plane vs. sph, t(%d)=%.1f, p=%.3f, effect size=%.2f \n',st.df,st.tstat,p,mean(tmpdata)/std(tmpdata));
+% display a few participant's regression result
+figure;
+selectSub=[5,9,11];
+for sub=1:length(selectSub)
+    mdl1=saveModel{selectSub(sub),1}; %plane model fit for this subject
+    mdl2=saveModel{selectSub(sub),2};%sph model fit for this subject
+    subplot(3,2,sub*2-1);plot(mdl1);title(sprintf('plane:Rsq=%.2f',mdl1.Rsquared.Ordinary));legend off;ylabel('turn ang'); xlabel('ideal plane turn');
+    subplot(3,2,sub*2);plot(mdl2);title(sprintf('sph:Rsq=%.2f',mdl2.Rsquared.Ordinary));legend off;ylabel('turn ang'); xlabel('ideal sph turn');
+end
+
+%% linear mixed model including all data, instead of separately looking individual data
+% I will check how BIC changes as I include more subject's data into the
+% model, from 5 subjects to entire 14 subjects
+for nSub=5:14;
+    cleandata_sph=cleanData_combine(cleanData_combine.sub<=nSub,:);
+    lme_sphData_turn_planeM=fitlme(cleandata_sph,'inboundTurnInDeg~1+idealPlane_inboundTurn+(1+idealPlane_inboundTurn|sub)');
+    lme_sphData_turn_sphM=fitlme(cleandata_sph,'inboundTurnInDeg~1+idealSph_inboundTurn+(1+idealSph_inboundTurn|sub)');
+
+    BIC_sphData_turn_planeM=lme_sphData_turn_planeM.ModelCriterion.BIC;
+    BIC_sphData_turn_sphM=lme_sphData_turn_sphM.ModelCriterion.BIC;
+    BICdiff=BIC_sphData_turn_sphM-BIC_sphData_turn_planeM;
+    BF_approx=exp(BICdiff/2);
+    fprintf('n=%d, BIC diff=%.1f, BF_approx=%.1E\n',nSub,BICdiff,BF_approx);
+
+    saveLME{nSub,1}=lme_sphData_turn_planeM;
+    saveLME{nSub,2}=lme_sphData_turn_sphM;
+    
+end
+% let's display the LME result when all 14 dataset were included
+display(lme_sphData_turn_planeM);
+display(lme_sphData_turn_sphM);
+##### SOURCE END #####
+--></body></html>
